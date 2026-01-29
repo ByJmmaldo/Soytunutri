@@ -1,11 +1,11 @@
-// data.js - BASE DE DATOS MAESTRA (V43 - Planes 10 al 25)
+// data.js - BASE DE DATOS MAESTRA (COLECCIÓN COMPLETA V50)
 
 // 1. PESOS Y MEDIDAS (Conversión de unidades a gramos)
 window.NUTRI_WEIGHTS = { 
     'huevo': 60, 'tortilla': 1, 'yogur': 125, 'tortitas': 8, 'platano': 100, 
     'fruta': 150, 'manzana': 180, 'kiwi': 80, 'pan_molde': 28, 'tostada': 20, 
     'gelatina': 125, 'cafe': 200, 'bacon': 40, 'galletas': 6, 'tortita_trigo': 40, 
-    'biscotes': 9, 'piña': 150, 'burger': 1, 'sandwich': 60
+    'biscotes': 9, 'piña': 150, 'burger': 1, 'sandwich': 60, 'rebanada': 30
 };
 
 // 2. DICCIONARIO NUTRICIONAL (Macros por 100g)
@@ -19,7 +19,7 @@ window.NUTRI_DB = {
     'gambas': {k:95,p:20,f:1.5,c:0}, 'gambitas': {k:95,p:20,f:1.5,c:0}, 'langostinos': {k:95,p:20,f:1.5,c:0},
     'sepia': {k:80,p:16,f:1,c:1}, 'anchoas': {k:210,p:29,f:10,c:0}, 'gulas': {k:150,p:12,f:10,c:2},
     'merluza': {k:80,p:17,f:1,c:0}, 'atun_lata': {k:100,p:24,f:1,c:0}, 'salmon': {k:208,p:20,f:13,c:0},
-    'costilla': {k:250,p:19,f:19,c:0}, 'carne_picada': {k:220,p:18,f:15,c:0},
+    'costilla': {k:250,p:19,f:19,c:0}, 'carne_picada': {k:220,p:18,f:15,c:0}, 'calamares': {k:175,p:15,f:11,c:2},
     
     // HUEVOS Y LACTEOS
     'huevo': {k:143,p:12.5,f:9.5,c:0.7}, 'claras': {k:52,p:11,f:0.2,c:0.7}, 'tortilla': {k:150,p:11,f:10,c:1},
@@ -54,10 +54,10 @@ window.NUTRI_DB = {
     'avellanas': {k:628,p:15,f:60,c:17}, 'crema_cacahuete': {k:590,p:25,f:49,c:16}, 'mayonesa': {k:300,p:1,f:30,c:5},
     'aceitunas': {k:115,p:0.8,f:10,c:0}, 'pesto': {k:400,p:5,f:40,c:5}, 'miel': {k:304,p:0,f:0,c:82},
     'cacao': {k:300,p:20,f:10,c:15}, 'gelatina': {k:10,p:1,f:0,c:0}, 'cafe': {k:2,p:0,f:0,c:0},
-    'caldo': {k:10,p:0.5,f:0.2,c:1}, 'salsa': {k:80,p:1,f:0,c:20}, 'te': {k:1,p:0,f:0,c:0}
+    'caldo': {k:10,p:0.5,f:0.2,c:1}, 'salsa': {k:80,p:1,f:0,c:20}, 'te': {k:1,p:0,f:0,c:0}, 'mermelada': {k:250,p:0,f:0,c:60}
 };
 
-// 3. COLECCIÓN DE PLANES (25 al 10)
+// 3. COLECCIÓN DE PLANES (25 al 5)
 window.NUTRI_PLANS = [
     // PLAN 25
     {
@@ -72,7 +72,7 @@ window.NUTRI_PLANS = [
             },
             "Martes": {
                 "Desayuno": [{k:"pan",n:"Pan",q:80},{k:"fruta",n:"Pieza Fruta",q:1},{k:"lomo_embuchado",n:"Lomo",q:25},{k:"aguacate",n:"Aguacate",q:60},{k:"cafe",n:"Café",q:1}],
-                "Media Mañana": [{k:"pan",n:"Pan",q:1}],
+                "Media Mañana": [{k:"pan",n:"Pan",q:1}], 
                 "Comida": [{k:"pasta",n:"Pasta",q:70},{k:"ternera",n:"Ternera",q:200},{k:"queso_fundir",n:"Queso",q:45}],
                 "Merienda": [{k:"tortitas",n:"Tortitas Maíz",q:4},{k:"pavo",n:"Pavo",q:50},{k:"nueces",n:"Nueces",q:15}],
                 "Cena": [{k:"calabacin",n:"Calabacín/Cebolla",q:150},{k:"atun_lata",n:"Atún",q:120},{k:"yogur",n:"Yogur Proteico",q:125},{k:"pan",n:"Pan",q:100}]
@@ -304,7 +304,7 @@ window.NUTRI_PLANS = [
             "Domingo": { "Desayuno":[{k:"leche",n:"Leche",q:400},{k:"pan",n:"Pan",q:125}], "Media Mañana":[{k:"arroz",n:"Arroz",q:70}], "Comida":[{k:"arroz",n:"Arroz Surimi",q:40},{k:"ternera",n:"Guiso",q:100}], "Merienda":[{k:"pan",n:"Pan",q:90}], "Cena":[{k:"boniato",n:"Tortilla Boniato",q:70},{k:"huevo",n:"Huevo",q:1}] }
         }
     },
-    // PLAN 14: 12-26 ENERO 2025
+    // PLAN 14
     {
         nombre: "12-26 Enero 2025 (Práctico)",
         dias: {
@@ -323,8 +323,7 @@ window.NUTRI_PLANS = [
             "Domingo": { "Desayuno":[{k:"leche",n:"Leche",q:300},{k:"pan",n:"Pan",q:70}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"fideos",n:"Sopa",q:60},{k:"pollo",n:"Pollo",q:150}], "Merienda":[{k:"pan",n:"Tostada",q:40}], "Cena":[{k:"atun_lata",n:"Atún",q:85}] }
         }
     },
-
-    // PLAN 13: ALTA PROTEÍNA
+    // PLAN 13
     {
         nombre: "Plan 13 - Alta Proteína",
         dias: {
@@ -343,8 +342,7 @@ window.NUTRI_PLANS = [
             "Domingo": { "Desayuno":[{k:"leche",n:"Leche",q:225},{k:"pan",n:"Pan",q:70}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"hamburguesa_ternera",n:"Hamburguesa",q:150},{k:"patata",n:"Patata",q:150}], "Merienda":[{k:"yogur",n:"Yogur",q:1}], "Cena":[{k:"salmon",n:"Salmón",q:150}] }
         }
     },
-
-    // PLAN 12: 17 DIC - 1 ENE (NAVIDAD)
+    // PLAN 12
     {
         nombre: "17 Dic - 1 Ene 2024 (Navidad)",
         dias: {
@@ -363,8 +361,7 @@ window.NUTRI_PLANS = [
             "Domingo": { "Desayuno":[{k:"leche",n:"Leche",q:225},{k:"pan",n:"Pan",q:100}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"fideos",n:"Sopa",q:80},{k:"ternera",n:"Ternera",q:150}], "Merienda":[{k:"pan",n:"Tostada",q:50}], "Cena":[{k:"salmon",n:"Salmón",q:150}] }
         }
     },
-
-    // PLAN 11: 3-17 NOVIEMBRE
+    // PLAN 11
     {
         nombre: "3-17 Noviembre 2024",
         dias: {
@@ -383,8 +380,7 @@ window.NUTRI_PLANS = [
             "Domingo": { "Desayuno":[{k:"leche",n:"Leche",q:300},{k:"pan",n:"Pan",q:90}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"patata",n:"Patata",q:200},{k:"costilla",n:"Costilla",q:200}], "Merienda":[{k:"pan",n:"Tostada",q:60}], "Cena":[{k:"atun_lata",n:"Atún",q:100},{k:"tomate",n:"Tomate",q:100}] }
         }
     },
-
-    // PLAN 10: 21 OCT - 3 NOV
+    // PLAN 10
     {
         nombre: "21 Oct - 3 Nov 2024",
         dias: {
@@ -401,6 +397,97 @@ window.NUTRI_PLANS = [
             "Viernes": { "Desayuno":[{k:"leche",n:"Leche",q:225},{k:"pan",n:"Pan",q:125}], "Media Mañana":[{k:"yogur",n:"Yogur",q:1}], "Comida":[{k:"garbanzos",n:"Garbanzos",q:150},{k:"bacalao",n:"Bacalao",q:200}], "Merienda":[{k:"fruta",n:"Fruta",q:1}], "Cena":[{k:"pizza",n:"Pizza",q:1}] },
             "Sábado": { "Desayuno":[{k:"leche",n:"Leche",q:225},{k:"pan",n:"Pan",q:125}], "Media Mañana":[{k:"pan",n:"Tostada",q:60}], "Comida":[{k:"arroz",n:"Paella",q:90},{k:"pollo",n:"Pollo",q:150}], "Merienda":[{k:"yogur",n:"Yogur",q:1}], "Cena":[{k:"lomo",n:"Lomo",q:180}] },
             "Domingo": { "Desayuno":[{k:"leche",n:"Leche",q:225},{k:"pan",n:"Pan",q:125}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"patata",n:"Patata",q:200},{k:"ternera",n:"Ternera",q:200}], "Merienda":[{k:"pan",n:"Tostada",q:60}], "Cena":[{k:"salmon",n:"Salmón",q:180}] }
+        }
+    },
+    // PLAN 9
+    {
+        nombre: "6-20 Octubre 2023",
+        dias: {
+            "Lunes": { "Desayuno":[{k:"leche",n:"Leche",q:300},{k:"pan",n:"Pan",q:40}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"garbanzos",n:"Garbanzos",q:130}], "Merienda":[{k:"yogur",n:"Yogur",q:1}], "Cena":[{k:"pollo",n:"Pollo",q:120}] },
+            "Martes": { "Desayuno":[{k:"leche",n:"Leche",q:300},{k:"pan",n:"Pan",q:40}], "Media Mañana":[{k:"yogur",n:"Yogur",q:1}], "Comida":[{k:"pasta",n:"Pasta",q:60},{k:"ternera",n:"Ternera",q:120}], "Merienda":[{k:"fruta",n:"Fruta",q:1}], "Cena":[{k:"merluza",n:"Merluza",q:150}] },
+            "Miércoles": { "Desayuno":[{k:"leche",n:"Leche",q:300},{k:"pan",n:"Pan",q:40}], "Media Mañana":[{k:"pan",n:"Tostada",q:30}], "Comida":[{k:"lentejas",n:"Lentejas",q:130}], "Merienda":[{k:"yogur",n:"Yogur",q:1}], "Cena":[{k:"huevo",n:"Tortilla",q:1}] },
+            "Jueves": { "Desayuno":[{k:"leche",n:"Leche",q:300},{k:"pan",n:"Pan",q:40}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"arroz",n:"Arroz",q:60},{k:"pollo",n:"Pollo",q:120}], "Merienda":[{k:"pan",n:"Tostada",q:30}], "Cena":[{k:"pavo",n:"Pavo",q:100}] },
+            "Viernes": { "Desayuno":[{k:"leche",n:"Leche",q:300},{k:"pan",n:"Pan",q:40}], "Media Mañana":[{k:"yogur",n:"Yogur",q:1}], "Comida":[{k:"judias",n:"Judías",q:150},{k:"patata",n:"Patata",q:100}], "Merienda":[{k:"fruta",n:"Fruta",q:1}], "Cena":[{k:"salmon",n:"Salmón",q:120}] },
+            "Sábado": { "Desayuno":[{k:"leche",n:"Leche",q:300},{k:"pan",n:"Pan",q:40}], "Media Mañana":[{k:"pan",n:"Tostada",q:30}], "Comida":[{k:"fideos",n:"Fideuá",q:60},{k:"gambas",n:"Gambas",q:100}], "Merienda":[{k:"yogur",n:"Yogur",q:1}], "Cena":[{k:"lomo",n:"Lomo",q:120}] },
+            "Domingo": { "Desayuno":[{k:"leche",n:"Leche",q:300},{k:"pan",n:"Pan",q:40}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"patata",n:"Patata",q:150},{k:"costilla",n:"Costilla",q:150}], "Merienda":[{k:"pan",n:"Tostada",q:30}], "Cena":[{k:"atun_lata",n:"Atún",q:80}] }
+        }
+    },
+    // PLAN 8
+    {
+        nombre: "20 Oct - 2 Nov (Mantenimiento)",
+        dias: {
+            "Lunes": { "Desayuno":[{k:"leche",n:"Leche",q:200},{k:"pan",n:"Pan",q:80}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"patata",n:"Patata",q:490}], "Merienda":[{k:"yogur",n:"Yogur",q:1}], "Cena":[{k:"huevo",n:"Tortilla",q:2}] },
+            "Martes": { "Desayuno":[{k:"leche",n:"Leche",q:200},{k:"pan",n:"Pan",q:80}], "Media Mañana":[{k:"yogur",n:"Yogur",q:1}], "Comida":[{k:"arroz",n:"Arroz",q:70},{k:"pollo",n:"Pollo",q:150}], "Merienda":[{k:"fruta",n:"Fruta",q:1}], "Cena":[{k:"merluza",n:"Merluza",q:150}] },
+            "Miércoles": { "Desayuno":[{k:"leche",n:"Leche",q:200},{k:"pan",n:"Pan",q:80}], "Media Mañana":[{k:"pan",n:"Tostada",q:40}], "Comida":[{k:"lentejas",n:"Lentejas",q:120}], "Merienda":[{k:"yogur",n:"Yogur",q:1}], "Cena":[{k:"pavo",n:"Pavo",q:120}] },
+            "Jueves": { "Desayuno":[{k:"leche",n:"Leche",q:200},{k:"pan",n:"Pan",q:80}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"pasta",n:"Pasta",q:70},{k:"ternera",n:"Ternera",q:150}], "Merienda":[{k:"pan",n:"Tostada",q:40}], "Cena":[{k:"huevo",n:"Huevo",q:2}] },
+            "Viernes": { "Desayuno":[{k:"leche",n:"Leche",q:200},{k:"pan",n:"Pan",q:80}], "Media Mañana":[{k:"yogur",n:"Yogur",q:1}], "Comida":[{k:"garbanzos",n:"Garbanzos",q:120}], "Merienda":[{k:"fruta",n:"Fruta",q:1}], "Cena":[{k:"salmon",n:"Salmón",q:150}] },
+            "Sábado": { "Desayuno":[{k:"leche",n:"Leche",q:200},{k:"pan",n:"Pan",q:80}], "Media Mañana":[{k:"pan",n:"Tostada",q:40}], "Comida":[{k:"arroz",n:"Paella",q:70}], "Merienda":[{k:"yogur",n:"Yogur",q:1}], "Cena":[{k:"lomo",n:"Lomo",q:120}] },
+            "Domingo": { "Desayuno":[{k:"leche",n:"Leche",q:200},{k:"pan",n:"Pan",q:80}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"fideos",n:"Sopa",q:70},{k:"pollo",n:"Pollo",q:150}], "Merienda":[{k:"pan",n:"Tostada",q:40}], "Cena":[{k:"atun_lata",n:"Atún",q:80}] }
+        }
+    },
+    // PLAN 7
+    {
+        nombre: "1-15 Diciembre 2024",
+        dias: {
+            "Lunes": { "Desayuno":[{k:"leche",n:"Leche",q:225},{k:"pan",n:"Pan",q:70}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"pavo",n:"Pavo",q:130}], "Merienda":[{k:"yogur",n:"Yogur",q:1}], "Cena":[{k:"atun_lata",n:"Atun",q:150}] },
+            "Martes": { "Desayuno":[{k:"leche",n:"Leche",q:225},{k:"pan",n:"Pan",q:70}], "Media Mañana":[{k:"yogur",n:"Yogur",q:1}], "Comida":[{k:"arroz",n:"Arroz",q:60},{k:"pollo",n:"Pollo",q:150}], "Merienda":[{k:"fruta",n:"Fruta",q:1}], "Cena":[{k:"merluza",n:"Merluza",q:150}] },
+            "Miércoles": { "Desayuno":[{k:"leche",n:"Leche",q:225},{k:"pan",n:"Pan",q:70}], "Media Mañana":[{k:"pan",n:"Tostada",q:40}], "Comida":[{k:"lentejas",n:"Lentejas",q:100}], "Merienda":[{k:"yogur",n:"Yogur",q:1}], "Cena":[{k:"huevo",n:"Tortilla",q:1}] },
+            "Jueves": { "Desayuno":[{k:"leche",n:"Leche",q:225},{k:"pan",n:"Pan",q:70}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"pasta",n:"Pasta",q:60},{k:"ternera",n:"Ternera",q:150}], "Merienda":[{k:"pan",n:"Tostada",q:40}], "Cena":[{k:"pavo",n:"Pavo",q:120}] },
+            "Viernes": { "Desayuno":[{k:"leche",n:"Leche",q:225},{k:"pan",n:"Pan",q:70}], "Media Mañana":[{k:"yogur",n:"Yogur",q:1}], "Comida":[{k:"garbanzos",n:"Garbanzos",q:100}], "Merienda":[{k:"fruta",n:"Fruta",q:1}], "Cena":[{k:"salmon",n:"Salmón",q:150}] },
+            "Sábado": { "Desayuno":[{k:"leche",n:"Leche",q:225},{k:"pan",n:"Pan",q:70}], "Media Mañana":[{k:"pan",n:"Tostada",q:40}], "Comida":[{k:"arroz",n:"Paella",q:60}], "Merienda":[{k:"yogur",n:"Yogur",q:1}], "Cena":[{k:"lomo",n:"Lomo",q:150}] },
+            "Domingo": { "Desayuno":[{k:"leche",n:"Leche",q:225},{k:"pan",n:"Pan",q:70}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"fideos",n:"Sopa",q:60}], "Merienda":[{k:"pan",n:"Tostada",q:40}], "Cena":[{k:"atun_lata",n:"Atún",q:80}] }
+        }
+    },
+    // PLAN 6
+    {
+        nombre: "24 Nov - 8 Dic 2025",
+        dias: {
+            "Lunes": { "Desayuno":[{k:"queso_ricotta",n:"Ricotta",q:150}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"pasta",n:"Pasta",q:40},{k:"langostinos",n:"Langostinos",q:50}], "Merienda":[{k:"yogur",n:"Yogur",q:1}], "Cena":[{k:"bacalao",n:"Bacalao",q:200}] },
+            "Martes": { "Desayuno":[{k:"queso_ricotta",n:"Ricotta",q:150}], "Media Mañana":[{k:"yogur",n:"Yogur",q:1}], "Comida":[{k:"arroz",n:"Arroz",q:40},{k:"pollo",n:"Pollo",q:150}], "Merienda":[{k:"fruta",n:"Fruta",q:1}], "Cena":[{k:"merluza",n:"Merluza",q:200}] },
+            "Miércoles": { "Desayuno":[{k:"queso_ricotta",n:"Ricotta",q:150}], "Media Mañana":[{k:"pan",n:"Tostada",q:30}], "Comida":[{k:"lentejas",n:"Lentejas",q:100}], "Merienda":[{k:"yogur",n:"Yogur",q:1}], "Cena":[{k:"huevo",n:"Tortilla",q:1}] },
+            "Jueves": { "Desayuno":[{k:"queso_ricotta",n:"Ricotta",q:150}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"garbanzos",n:"Garbanzos",q:100}], "Merienda":[{k:"pan",n:"Tostada",q:30}], "Cena":[{k:"pavo",n:"Pavo",q:150}] },
+            "Viernes": { "Desayuno":[{k:"queso_ricotta",n:"Ricotta",q:150}], "Media Mañana":[{k:"yogur",n:"Yogur",q:1}], "Comida":[{k:"judias",n:"Judías",q:150}], "Merienda":[{k:"fruta",n:"Fruta",q:1}], "Cena":[{k:"salmon",n:"Salmón",q:200}] },
+            "Sábado": { "Desayuno":[{k:"queso_ricotta",n:"Ricotta",q:150}], "Media Mañana":[{k:"pan",n:"Tostada",q:30}], "Comida":[{k:"arroz",n:"Paella",q:40}], "Merienda":[{k:"yogur",n:"Yogur",q:1}], "Cena":[{k:"lomo",n:"Lomo",q:150}] },
+            "Domingo": { "Desayuno":[{k:"queso_ricotta",n:"Ricotta",q:150}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"patata",n:"Patata",q:150}], "Merienda":[{k:"pan",n:"Tostada",q:30}], "Cena":[{k:"atun_lata",n:"Atún",q:100}] }
+        }
+    },
+    // PLAN 5
+    {
+        nombre: "14-28 Diciembre 2025",
+        dias: {
+            "Lunes": { "Desayuno":[{k:"pan",n:"Pan",q:60},{k:"huevo",n:"Huevo",q:4}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"garbanzos",n:"Garbanzos",q:120}], "Merienda":[{k:"yogur",n:"Yogur",q:1}], "Cena":[{k:"bacalao",n:"Bacalao",q:200}] },
+            "Martes": { "Desayuno":[{k:"pan",n:"Pan",q:60},{k:"huevo",n:"Huevo",q:4}], "Media Mañana":[{k:"yogur",n:"Yogur",q:1}], "Comida":[{k:"arroz",n:"Arroz",q:60}], "Merienda":[{k:"fruta",n:"Fruta",q:1}], "Cena":[{k:"merluza",n:"Merluza",q:200}] },
+            "Miércoles": { "Desayuno":[{k:"pan",n:"Pan",q:60},{k:"huevo",n:"Huevo",q:4}], "Media Mañana":[{k:"pan",n:"Tostada",q:30}], "Comida":[{k:"lentejas",n:"Lentejas",q:120}], "Merienda":[{k:"yogur",n:"Yogur",q:1}], "Cena":[{k:"huevo",n:"Tortilla",q:1}] },
+            "Jueves": { "Desayuno":[{k:"pan",n:"Pan",q:60},{k:"huevo",n:"Huevo",q:4}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"pasta",n:"Pasta",q:60}], "Merienda":[{k:"pan",n:"Tostada",q:30}], "Cena":[{k:"pavo",n:"Pavo",q:150}] },
+            "Viernes": { "Desayuno":[{k:"pan",n:"Pan",q:60},{k:"huevo",n:"Huevo",q:4}], "Media Mañana":[{k:"yogur",n:"Yogur",q:1}], "Comida":[{k:"judias",n:"Judías",q:150}], "Merienda":[{k:"fruta",n:"Fruta",q:1}], "Cena":[{k:"salmon",n:"Salmón",q:200}] },
+            "Sábado": { "Desayuno":[{k:"pan",n:"Pan",q:60},{k:"huevo",n:"Huevo",q:4}], "Media Mañana":[{k:"pan",n:"Tostada",q:30}], "Comida":[{k:"arroz",n:"Paella",q:60}], "Merienda":[{k:"yogur",n:"Yogur",q:1}], "Cena":[{k:"lomo",n:"Lomo",q:150}] },
+            "Domingo": { "Desayuno":[{k:"pan",n:"Pan",q:60},{k:"huevo",n:"Huevo",q:4}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"patata",n:"Patata",q:150}], "Merienda":[{k:"pan",n:"Tostada",q:30}], "Cena":[{k:"atun_lata",n:"Atún",q:100}] }
+        }
+    },
+    // MALDO NOVIEMBRE
+    {
+        nombre: "Maldo Noviembre (Definición)",
+        dias: {
+            "Lunes": { "Desayuno":[{k:"queso_ricotta",n:"Ricotta",q:150}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"pasta",n:"Pasta",q:40},{k:"langostinos",n:"Langostinos",q:50}], "Merienda":[{k:"yogur",n:"Yogur",q:1}], "Cena":[{k:"bacalao",n:"Bacalao",q:200}] },
+            "Martes": { "Desayuno":[{k:"queso_ricotta",n:"Ricotta",q:150}], "Media Mañana":[{k:"yogur",n:"Yogur",q:1}], "Comida":[{k:"arroz",n:"Arroz",q:40},{k:"pollo",n:"Pollo",q:150}], "Merienda":[{k:"fruta",n:"Fruta",q:1}], "Cena":[{k:"merluza",n:"Merluza",q:200}] },
+            "Miércoles": { "Desayuno":[{k:"queso_ricotta",n:"Ricotta",q:150}], "Media Mañana":[{k:"pan",n:"Tostada",q:30}], "Comida":[{k:"lentejas",n:"Lentejas",q:100}], "Merienda":[{k:"yogur",n:"Yogur",q:1}], "Cena":[{k:"huevo",n:"Tortilla",q:1}] },
+            "Jueves": { "Desayuno":[{k:"queso_ricotta",n:"Ricotta",q:150}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"garbanzos",n:"Garbanzos",q:100}], "Merienda":[{k:"pan",n:"Tostada",q:30}], "Cena":[{k:"pavo",n:"Pavo",q:150}] },
+            "Viernes": { "Desayuno":[{k:"queso_ricotta",n:"Ricotta",q:150}], "Media Mañana":[{k:"yogur",n:"Yogur",q:1}], "Comida":[{k:"judias",n:"Judías",q:150}], "Merienda":[{k:"fruta",n:"Fruta",q:1}], "Cena":[{k:"salmon",n:"Salmón",q:200}] },
+            "Sábado": { "Desayuno":[{k:"queso_ricotta",n:"Ricotta",q:150}], "Media Mañana":[{k:"pan",n:"Tostada",q:30}], "Comida":[{k:"arroz",n:"Paella",q:40}], "Merienda":[{k:"yogur",n:"Yogur",q:1}], "Cena":[{k:"lomo",n:"Lomo",q:150}] },
+            "Domingo": { "Desayuno":[{k:"queso_ricotta",n:"Ricotta",q:150}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"patata",n:"Patata",q:150}], "Merienda":[{k:"pan",n:"Tostada",q:30}], "Cena":[{k:"atun_lata",n:"Atún",q:100}] }
+        }
+    },
+    // MALDO DICIEMBRE
+    {
+        nombre: "Maldo Diciembre (Volumen)",
+        dias: {
+            "Lunes": { "Desayuno":[{k:"pan",n:"Pan",q:60},{k:"huevo",n:"Huevo",q:4}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"garbanzos",n:"Garbanzos",q:120},{k:"atun_lata",n:"Atun",q:112}], "Merienda":[{k:"yogur",n:"Yogur",q:1}], "Cena":[{k:"bacalao",n:"Bacalao",q:200}] },
+            "Martes": { "Desayuno":[{k:"pan",n:"Pan",q:60},{k:"huevo",n:"Huevo",q:4}], "Media Mañana":[{k:"yogur",n:"Yogur",q:1}], "Comida":[{k:"arroz",n:"Arroz",q:60},{k:"pollo",n:"Pollo",q:150}], "Merienda":[{k:"fruta",n:"Fruta",q:1}], "Cena":[{k:"merluza",n:"Merluza",q:200}] },
+            "Miércoles": { "Desayuno":[{k:"pan",n:"Pan",q:60},{k:"huevo",n:"Huevo",q:4}], "Media Mañana":[{k:"pan",n:"Tostada",q:30}], "Comida":[{k:"lentejas",n:"Lentejas",q:120}], "Merienda":[{k:"yogur",n:"Yogur",q:1}], "Cena":[{k:"huevo",n:"Tortilla",q:1}] },
+            "Jueves": { "Desayuno":[{k:"pan",n:"Pan",q:60},{k:"huevo",n:"Huevo",q:4}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"pasta",n:"Pasta",q:60}], "Merienda":[{k:"pan",n:"Tostada",q:30}], "Cena":[{k:"pavo",n:"Pavo",q:150}] },
+            "Viernes": { "Desayuno":[{k:"pan",n:"Pan",q:60},{k:"huevo",n:"Huevo",q:4}], "Media Mañana":[{k:"yogur",n:"Yogur",q:1}], "Comida":[{k:"judias",n:"Judías",q:150}], "Merienda":[{k:"fruta",n:"Fruta",q:1}], "Cena":[{k:"salmon",n:"Salmón",q:200}] },
+            "Sábado": { "Desayuno":[{k:"pan",n:"Pan",q:60},{k:"huevo",n:"Huevo",q:4}], "Media Mañana":[{k:"pan",n:"Tostada",q:30}], "Comida":[{k:"arroz",n:"Paella",q:60}], "Merienda":[{k:"yogur",n:"Yogur",q:1}], "Cena":[{k:"lomo",n:"Lomo",q:150}] },
+            "Domingo": { "Desayuno":[{k:"pan",n:"Pan",q:60},{k:"huevo",n:"Huevo",q:4}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"patata",n:"Patata",q:150}], "Merienda":[{k:"pan",n:"Tostada",q:30}], "Cena":[{k:"atun_lata",n:"Atún",q:100}] }
         }
     }
 ];

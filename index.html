@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NutriMaster Pro - Colección Completa V38</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        [x-cloak] { display: none !important; }
+        body { font-family: system-ui, -apple-system, sans-serif; background-color: #f8fafc; color: #1e293b; }
+        .meal-card { background: white; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .day-btn { @apply flex-1 py-2 px-1 rounded-lg text-[10px] font-bold uppercase tracking-wider border border-slate-200 bg-white text-slate-500 transition-all; }
+        .day-btn.active { @apply bg-emerald-500 text-white border-emerald-500 shadow-md transform scale-105; }
+        select { background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em 1.5em; padding-right: 2.5rem; -webkit-appearance: none; appearance: none; }
+    </style>
+</head>
+<body class="antialiased">
+
+<div x-data="nutritionApp()" x-init="initApp()" class="max-w-3xl mx-auto min-h-screen bg-white shadow-2xl flex flex-col border-x border-slate-100">
+
+    <div class="bg-slate-900 text-white p-4 sticky top-0 z-50 shadow-lg">
+        <div class="flex justify-between items-end mb-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-emerald-500 rounded-lg flex items-center justify-center text-white font-bold text-xl"><i class="fas fa-layer-group"></i></div>
+                <div>
+                    <h1 class="text-lg font-black tracking-tight">NUTRI<span class="text-emerald-400">MASTER</span></h1>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase">V38 • ALL-IN-ONE</p>
+                </div>
+            </div>
+            <div class="text-right">
+                <div class="text-3xl font-black leading-none" x-text="Math.round(totals.kcal)">0</div>
+                <div class="text-[9px] font-bold text-emerald-400 uppercase tracking-widest">Kcal <span x-text="currentDay"></span></div>
+            </div>
+        </div>
+
+        <div class="space-y-2">
+            <select x-model="selectedPlanIdx" @change="loadPlan()" class="w-full bg-slate-800 border border-slate-700 text-white text-xs rounded-lg py-3 px-3 font-bold focus:ring-1 focus:ring-emerald-500 outline-none">
+                <template x-for="(plan, index) in plans" :key="index">
+                    <option :value="index" x-text="plan.nombre"></option>
+                </template>
+            </select>
+
+            <div class="flex gap-1 overflow-x-auto pb-1 scrollbar-hide">
+                <template x-for="day in weekDays" :key="day">
+                    <button @click="setDay(day)" class="day-btn" :class="{'active': currentDay === day}">
+                        <span x-text="day.substring(0,3)"></span>
+                    </button>
+                </template>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex-1 p-4 overflow-y-auto bg-slate-50 pb-32">
+        
+        <div class="grid grid-cols-3 gap-2 mb-6">
+            <div class="bg-white p-3 rounded-xl border border-slate-200 text-center shadow-sm">
+                <div class="text-blue-600 font-black text-xl" x-text="Math.round(totals.p)">0</div>
+                <div class="text-[9px] text-slate-400 font-bold uppercase">Prot (g)</div>
+            </div>
+            <div class="bg-white p-3 rounded-xl border border-slate-200 text-center shadow-sm">
+                <div class="text-amber-500 font-black text-xl" x-text="Math.round(totals.f)">0</div>
+                <div class="text-[9px] text-slate-400 font-bold uppercase">Grasa (g)</div>
+            </div>
+            <div class="bg-white p-3 rounded-xl border border-slate-200 text-center shadow-sm">
+                <div class="text-rose-500 font-black text-xl" x-text="Math.round(totals.c)">0</div>
+                <div class="text-[9px] text-slate-400 font-bold uppercase">Carbs (g)</div>
+            </div>
+        </div>
+
+        <div class="space-y-3">
+            <template x-for="mealName in mealOrder" :key="mealName">
+                <div class="meal-card" x-show="dayData && dayData[mealName] && dayData[mealName].length > 0">
+                    <div class="px-4 py-2 border-b border-slate-100 flex justify-between items-center bg-slate-50/50 rounded-t-xl">
+                        <h3 class="font-black text-slate-700 text-[10px] uppercase tracking-widest flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full" :class="getMealColor(mealName)"></span>
+                            <span x-text="mealName"></span>
+                        </h3>
+                        <span class="text-[9px] font-bold text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200" x-text="getMealKcal(dayData[mealName]) + ' kcal'"></span>
+                    </div>
+                    <ul class="divide-y divide-slate-50">
+                        <template x-for="ing in dayData[mealName]" :key="ing.n">
+                            <li class="px-4 py-2.5 flex justify-between items-center hover:bg-slate-50">
+                                <div>
+                                    <div class="font-bold text-slate-800 text-xs" x-text="ing.n"></div>
+                                    <div class="flex gap-2 text-[9px] font-semibold text-slate-400" x-show="db[ing.k]">
+                                        <span class="text-blue-400">P:<span x-text="Math.round(calc(ing.k, ing.q).p)"></span></span>
+                                        <span class="text-rose-400">C:<span x-text="Math.round(calc(ing.k, ing.q).c)"></span></span>
+                                        <span class="text-amber-400">G:<span x-text="Math.round(calc(ing.k, ing.q).f)"></span></span>
+                                    </div>
+                                    <div x-show="!db[ing.k]" class="text-[8px] text-red-500 font-bold bg-red-50 px-1 rounded inline-block mt-0.5">⚠️ No en DB</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="font-black text-slate-800 text-sm" x-text="ing.q"></div>
+                                    <div class="text-[8px] uppercase text-slate-400 font-bold" x-text="getUnit(ing.k)"></div>
+                                </div>
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+            </template>
+            
+            <div x-show="!hasData" class="text-center py-10 text-slate-400 text-xs italic">
+                Cargando datos...
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function nutritionApp() {
+        // 1. DATA: PESOS
+        const WEIGHTS = { 'huevo': 60, 'tortilla': 1, 'yogur': 125, 'tortitas': 8, 'platano': 100, 'fruta': 150, 'manzana': 180, 'kiwi': 80, 'pan_molde': 28, 'tostada': 20, 'gelatina': 125, 'cafe': 200, 'bacon': 40, 'galletas': 6, 'tortita_trigo': 40, 'biscotes': 9 };
+        
+        // 2. DATA: ALIMENTOS
+        const DB = {
+            'pan': {k:260, p:8, f:2, c:50}, 'pan_integral': {k:250, p:9, f:3, c:45}, 'pan_molde': {k:260, p:8, f:3, c:48},
+            'huevo': {k:143, p:12.5, f:9.5, c:0.7}, 'claras': {k:52, p:11, f:0.2, c:0.7}, 'tortilla': {k:150, p:11, f:10, c:1},
+            'pollo': {k:110, p:23, f:1.2, c:0}, 'ternera': {k:130, p:21, f:4, c:0}, 'pavo': {k:105, p:22, f:2, c:0},
+            'lomo': {k:145, p:21, f:6, c:0}, 'lomo_embuchado': {k:190, p:38, f:6, c:0},
+            'jamon_cocido': {k:105, p:18, f:3, c:1}, 'jamon_serrano': {k:240, p:30, f:12, c:0},
+            'atun_lata': {k:100, p:24, f:1, c:0}, 'salmon': {k:208, p:20, f:13, c:0}, 'bacalao': {k:82, p:18, f:0.7, c:0},
+            'merluza': {k:80, p:17, f:1, c:0}, 'surimi': {k:95, p:8, f:2, c:10}, 'gambas': {k:95, p:20, f:1.5, c:0}, 'gambitas': {k:95, p:20, f:1.5, c:0}, 'langostinos': {k:95, p:20, f:1.5, c:0},
+            'arroz': {k:360, p:7, f:1, c:78}, 'pasta': {k:350, p:12, f:1.5, c:72}, 'patata': {k:77, p:2, f:0.1, c:17},
+            'boniato': {k:86, p:1.6, f:0.1, c:20}, 'avena': {k:370, p:13, f:7, c:60}, 'cuscus': {k:112, p:3.8, f:0.2, c:23},
+            'garbanzos': {k:120, p:7, f:2, c:20}, 'lentejas': {k:115, p:9, f:0.5, c:20}, 'guisantes': {k:81, p:5, f:0.5, c:14}, 'habitas': {k:80, p:6, f:0.5, c:12},
+            'leche': {k:45, p:3, f:1.5, c:5}, 'leche_entera': {k:62, p:3, f:3.5, c:5}, 'yogur': {k:60, p:4.5, f:3, c:4},
+            'queso_fresco': {k:70, p:11, f:2, c:3}, 'queso_batido': {k:46, p:8, f:0.1, c:3.5}, 'queso_fundir': {k:300, p:20, f:22, c:1},
+            'aguacate': {k:160, p:2, f:15, c:9}, 'aceite': {k:884, p:0, f:100, c:0}, 'nueces': {k:654, p:15, f:65, c:14},
+            'almendras': {k:579, p:21, f:50, c:22}, 'anacardos': {k:553, p:18, f:44, c:30}, 'crema_cacahuete': {k:590, p:25, f:49, c:16},
+            'tomate': {k:18, p:1, f:0.2, c:4}, 'verdura': {k:30, p:2, f:0.2, c:5}, 'espinacas': {k:23, p:3, f:0.4, c:3.6},
+            'calabacin': {k:17, p:1, f:0.3, c:3}, 'champinones': {k:22, p:3, f:0.3, c:3}, 'pisto': {k:80, p:2, f:5, c:8},
+            'fruta': {k:50, p:0.5, f:0.2, c:12}, 'platano': {k:89, p:1, f:0.3, c:23}, 'manzana': {k:52, p:0.3, f:0.2, c:14},
+            'fresas': {k:32, p:0.7, f:0.3, c:8}, 'piña': {k:50, p:0.5, f:0.1, c:13}, 'kiwi': {k:61, p:1, f:0.5, c:15},
+            'tortitas': {k:380, p:8, f:3, c:80}, 'tortita_trigo': {k:300, p:8, f:5, c:50}, 'biscotes': {k:390, p:10, f:6, c:72},
+            'cafe': {k:2, p:0, f:0, c:0}, 'cacao': {k:300, p:20, f:10, c:15}, 'mermelada': {k:250, p:0, f:0, c:60},
+            'burger_pollo_90': {k:140, p:20, f:6, c:2}, 'hamburguesa_ternera': {k:220, p:17, f:15, c:1},
+            'queso_cabra': {k:360, p:22, f:30, c:0}, 'queso_ricotta': {k:174, p:11, f:13, c:3}, 'mozarella': {k:280, p:18, f:22, c:3}, 'albondigas_pollo': {k:160, p:18, f:8, c:4},
+            'mayonesa': {k:300, p:1, f:30, c:5}, 'aceitunas': {k:115, p:0.8, f:10, c:0}, 'caldo': {k:10, p:0.5, f:0.2, c:1}, 
+            'salsa': {k:80, p:1, f:0, c:20}, 'te': {k:1, p:0, f:0, c:0}, 'anchoas': {k:210, p:29, f:10, c:0},
+            'avellanas': {k:628, p:15, f:60, c:17}, 'cebolla': {k:40, p:1, f:0.1, c:9}, 'esparragos': {k:20, p:2, f:0.1, c:4}, 'berenjena': {k:25, p:1, f:0.2, c:6}, 
+            'pepino': {k:15, p:0.7, f:0.1, c:3}, 'endivias': {k:17, p:1, f:0.2, c:3}, 'canonigos': {k:21, p:2, f:0.4, c:3}, 'calabaza': {k:26, p:1, f:0.1, c:6}
+        };
+
+        // 3. DATA: PLANES (COPIA EXACTA DE LOS PDFS)
+        const PLANS = [
+            // PLAN 8 DE JUNIO (Volumen Alto) [PDF 25]
+            {
+                nombre: "8 Junio (Volumen Alto)",
+                dias: {
+                    "Lunes": {
+                        "Desayuno": [{k:"pan",n:"Pan",q:120},{k:"huevo",n:"Huevo",q:1},{k:"aguacate",n:"Aguacate",q:60},{k:"cafe",n:"Café",q:1}],
+                        "Media Mañana": [{k:"fruta",n:"Pieza Fruta",q:1}],
+                        "Comida": [{k:"garbanzos",n:"Garbanzos",q:300},{k:"pollo",n:"Pollo",q:200},{k:"pisto",n:"Pisto",q:150}],
+                        "Merienda": [{k:"pan",n:"Pan",q:80},{k:"lomo_embuchado",n:"Lomo",q:25},{k:"nueces",n:"Nueces",q:15}],
+                        "Cena": [{k:"claras",n:"Revuelto Claras",q:100},{k:"huevo",n:"Huevo",q:2},{k:"yogur",n:"Yogur Griego",q:125},{k:"pan",n:"Pan",q:100}]
+                    },
+                    "Martes": {
+                        "Desayuno": [{k:"pan",n:"Pan",q:80},{k:"fruta",n:"Fruta",q:1},{k:"lomo_embuchado",n:"Lomo",q:25},{k:"aguacate",n:"Aguacate",q:60},{k:"cafe",n:"Café",q:1}],
+                        "Media Mañana": [{k:"pan",n:"Pan",q:1}], 
+                        "Comida": [{k:"pasta",n:"Pasta",q:70},{k:"ternera",n:"Ternera",q:200},{k:"queso_fundir",n:"Queso",q:45}],
+                        "Merienda": [{k:"tortitas",n:"Tortitas Maíz",q:4},{k:"pavo",n:"Pavo",q:50},{k:"nueces",n:"Nueces",q:15}],
+                        "Cena": [{k:"calabacin",n:"Calabacín/Cebolla",q:150},{k:"atun_lata",n:"Atún",q:120},{k:"yogur",n:"Yogur Proteico",q:125},{k:"pan",n:"Pan",q:100}]
+                    },
+                    "Miércoles": { "Desayuno":[{k:"pan",n:"Pan",q:120},{k:"huevo",n:"Huevo",q:1},{k:"aguacate",n:"Aguacate",q:60}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"lentejas",n:"Lentejas",q:300},{k:"atun_lata",n:"Atun",q:120},{k:"huevo",n:"Huevo",q:2},{k:"aguacate",n:"Aguacate",q:90}], "Merienda":[{k:"platano",n:"Platano",q:1},{k:"queso_batido",n:"Queso Batido",q:90},{k:"crema_cacahuete",n:"Crema CC",q:15}], "Cena":[{k:"pollo",n:"Pollo Soja",q:150},{k:"champinones",n:"Champiñones",q:50},{k:"pan",n:"Pan",q:100}] },
+                    "Jueves": { "Desayuno":[{k:"pan",n:"Pan",q:80},{k:"fruta",n:"Fruta",q:1},{k:"pavo",n:"Pavo",q:50},{k:"aceite",n:"Aceite",q:10}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"arroz",n:"Arroz",q:70},{k:"salmon",n:"Salmón",q:160}], "Merienda":[{k:"platano",n:"Platano",q:1},{k:"queso_batido",n:"Queso Batido",q:90},{k:"crema_cacahuete",n:"Crema CC",q:15}], "Cena":[{k:"ternera",n:"Fajita Ternera",q:90},{k:"tortita_trigo",n:"Tortitas",q:2},{k:"verdura",n:"Verduras",q:100},{k:"yogur",n:"Yogur Griego",q:125},{k:"pan",n:"Pan",q:100}] },
+                    "Viernes": { "Desayuno":[{k:"pan",n:"Pan",q:40},{k:"pavo",n:"Pavo",q:50},{k:"aceite",n:"Aceite",q:10}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"verdura",n:"Revuelto Verduras",q:150},{k:"lomo",n:"Solomillo",q:160}], "Merienda":[{k:"tortitas",n:"Tortitas",q:4},{k:"pavo",n:"Pavo",q:50},{k:"nueces",n:"Nueces",q:15}], "Cena":[{k:"verdura",n:"Ensalada",q:100},{k:"huevo",n:"Huevo",q:1},{k:"atun_lata",n:"Atun",q:60},{k:"aceitunas",n:"Aceitunas",q:15},{k:"pan",n:"Pan",q:100}] },
+                    "Sábado": { "Desayuno":[{k:"pan",n:"Pan",q:120},{k:"huevo",n:"Huevo",q:1},{k:"aguacate",n:"Aguacate",q:60}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"pisto",n:"Pisto",q:100},{k:"cuscus",n:"Cuscus",q:75},{k:"pollo",n:"Pollo",q:200}], "Merienda":[{k:"pan",n:"Pan",q:80},{k:"lomo_embuchado",n:"Lomo",q:25},{k:"nueces",n:"Nueces",q:15}], "Cena":[{k:"huevo",n:"Tortilla",q:1},{k:"claras",n:"Claras",q:100},{k:"espinacas",n:"Espinacas",q:50},{k:"pan",n:"Pan",q:100}] },
+                    "Domingo": { "Desayuno":[{k:"pan",n:"Pan",q:80},{k:"aceite",n:"Aceite",q:10},{k:"lomo_embuchado",n:"Lomo",q:25}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"arroz",n:"Arroz",q:70},{k:"burger_pollo_90",n:"Hamburguesa",q:200}], "Merienda":[{k:"tortitas",n:"Tortitas",q:4},{k:"pavo",n:"Pavo",q:50},{k:"nueces",n:"Nueces",q:15}], "Cena":[{k:"salmon",n:"Salmón",q:120},{k:"pisto",n:"Pisto",q:100},{k:"pan",n:"Pan",q:100}] }
+                }
+            },
+            {
+                nombre: "9-22 Junio (PDF 24)",
+                dias: {
+                    "Lunes": { 
+                        "Desayuno":[{k:"leche",n:"Leche",q:225},{k:"pan",n:"Pan",q:70},{k:"jamon_cocido",n:"Jamón",q:30},{k:"platano",n:"Plátano",q:1},{k:"almendras",n:"Almendras",q:15}],
+                        "Media Mañana":[{k:"pan_molde",n:"Tostada Integral",q:90},{k:"jamon_serrano",n:"Jamón",q:45}],
+                        "Comida":[{k:"lentejas",n:"Lentejas Setas",q:175},{k:"champinones",n:"Setas",q:50},{k:"pollo",n:"Pollo",q:150},{k:"tomate",n:"Tomate",q:50},{k:"fresas",n:"Fresas",q:150}],
+                        "Merienda":[{k:"fresas",n:"Fresas",q:150},{k:"yogur",n:"Yogur",q:125}],
+                        "Cena":[{k:"huevo",n:"Tortilla",q:1},{k:"claras",n:"Claras",q:70},{k:"queso_fresco",n:"Queso",q:60},{k:"manzana",n:"Manzana",q:1}]
+                    },
+                    "Martes": { "Desayuno":[{k:"leche",n:"Leche Calcio",q:150},{k:"pan_integral",n:"Pan",q:40},{k:"tomate",n:"Tomate",q:30},{k:"jamon_serrano",n:"Jamón",q:15},{k:"platano",n:"Plátano",q:1},{k:"almendras",n:"Almendras",q:15}], "Media Mañana":[{k:"queso_batido",n:"Queso Batido",q:120},{k:"avellanas",n:"Avellanas",q:15},{k:"fresas",n:"Fresas",q:120}], "Comida":[{k:"pasta",n:"Espaguetis",q:40},{k:"salmon",n:"Salmón",q:170},{k:"canonigos",n:"Canónigos",q:50},{k:"manzana",n:"Manzana",q:1}], "Merienda":[{k:"fresas",n:"Fresas",q:150},{k:"yogur",n:"Yogur",q:125}], "Cena":[{k:"burger_pollo_90",n:"Hamburguesa",q:130},{k:"pisto",n:"Pisto",q:100},{k:"platano",n:"Plátano",q:1}] },
+                    "Miércoles": { "Desayuno":[{k:"leche",n:"Leche",q:225},{k:"pan",n:"Pan",q:70},{k:"aguacate",n:"Aguacate",q:50}], "Media Mañana":[{k:"pan_molde",n:"Tostada",q:90},{k:"aguacate",n:"Aguacate",q:75}], "Comida":[{k:"lentejas",n:"Lentejas",q:80},{k:"pavo",n:"Pavo",q:200}], "Merienda":[{k:"yogur",n:"Yogur",q:125}], "Cena":[{k:"atun_lata",n:"Atun",q:100}] },
+                    "Jueves": { "Desayuno":[{k:"leche",n:"Leche",q:225},{k:"pan",n:"Pan",q:70}], "Media Mañana":[{k:"yogur",n:"Yogur",q:125},{k:"platano",n:"Platano",q:1}], "Comida":[{k:"pasta",n:"Pasta",q:40},{k:"hamburguesa_ternera",n:"Hamburguesa",q:130}], "Merienda":[{k:"yogur",n:"Yogur",q:125}], "Cena":[{k:"huevo",n:"Tortilla",q:1},{k:"claras",n:"Claras",q:35}] },
+                    "Viernes": { "Desayuno":[{k:"leche",n:"Leche",q:225},{k:"pan",n:"Pan",q:70}], "Media Mañana":[{k:"pan_molde",n:"Tostada",q:90}], "Comida":[{k:"arroz",n:"Arroz",q:70},{k:"salmon",n:"Salmon",q:75}], "Merienda":[{k:"yogur",n:"Yogur",q:125}], "Cena":[{k:"pollo",n:"Pollo",q:100}] },
+                    "Sábado": { "Desayuno":[{k:"leche",n:"Leche",q:225},{k:"pan",n:"Pan",q:100}], "Media Mañana":[{k:"yogur",n:"Yogur",q:250},{k:"nueces",n:"Nueces",q:10}], "Comida":[{k:"guisantes",n:"Guisantes",q:150},{k:"gambas",n:"Gambas",q:100},{k:"ternera",n:"Ternera",q:150}], "Merienda":[{k:"yogur",n:"Yogur",q:125}], "Cena":[{k:"pavo",n:"Pavo",q:125}] },
+                    "Domingo": { "Desayuno":[{k:"leche",n:"Leche",q:225},{k:"pan",n:"Pan",q:70}], "Media Mañana":[{k:"pan_molde",n:"Tostada",q:90}], "Comida":[{k:"pasta",n:"Pasta",q:40},{k:"atun_lata",n:"Atun",q:100}], "Merienda":[{k:"yogur",n:"Yogur",q:125}], "Cena":[{k:"salmon",n:"Salmon",q:120}] }
+                }
+            },
+            {
+                nombre: "19 Mayo - 1 Junio (PDF 23)",
+                dias: {
+                     "Lunes": { "Desayuno":[{k:"leche",n:"Leche",q:150},{k:"pan",n:"Pan",q:40}], "Media Mañana":[{k:"pan_molde",n:"Tostada",q:90},{k:"lomo_embuchado",n:"Lomo",q:40}], "Comida":[{k:"garbanzos",n:"Garbanzos",q:120},{k:"pollo",n:"Pollo",q:120}], "Merienda":[{k:"queso_batido",n:"Queso",q:240},{k:"nueces",n:"Nueces",q:15}], "Cena":[{k:"huevo",n:"Tortilla",q:1},{k:"jamon_cocido",n:"Jamón",q:30}] },
+                     "Martes": { "Desayuno":[{k:"leche",n:"Leche",q:150},{k:"pan",n:"Pan",q:70}], "Media Mañana":[{k:"yogur",n:"Yogur",q:250},{k:"avellanas",n:"Avellanas",q:25}], "Comida":[{k:"pasta",n:"Pasta",q:60},{k:"burger_pollo_90",n:"Hamburguesa",q:130}], "Merienda":[{k:"yogur",n:"Yogur",q:125}], "Cena":[{k:"hamburguesa_ternera",n:"Hamburguesa",q:130}] },
+                     "Miércoles": { "Desayuno":[{k:"leche",n:"Leche",q:150},{k:"pan",n:"Pan",q:40}], "Media Mañana":[{k:"pan_molde",n:"Tostada",q:90},{k:"aguacate",n:"Aguacate",q:75}], "Comida":[{k:"lentejas",n:"Lentejas",q:250},{k:"pollo",n:"Pollo",q:120}], "Merienda":[{k:"queso_batido",n:"Queso Batido",q:125}], "Cena":[{k:"pavo",n:"Pavo",q:100}] },
+                     "Jueves": { "Desayuno":[{k:"leche",n:"Leche",q:150},{k:"pan",n:"Pan",q:100}], "Media Mañana":[{k:"pan",n:"Pan",q:70}], "Comida":[{k:"yogur",n:"Yogur",q:250},{k:"arroz",n:"Arroz",q:40},{k:"burger_pollo_90",n:"Hamburguesa",q:130}], "Merienda":[{k:"queso_batido",n:"Queso Batido",q:125}], "Cena":[{k:"atun_lata",n:"Atun",q:35},{k:"claras",n:"Claras",q:100}] },
+                     "Viernes": { "Desayuno":[{k:"leche",n:"Leche",q:150},{k:"pan",n:"Pan",q:70}], "Media Mañana":[{k:"pan_molde",n:"Tostada",q:120}], "Comida":[{k:"arroz",n:"Arroz",q:40},{k:"salmon",n:"Salmon",q:75}], "Merienda":[{k:"yogur",n:"Yogur",q:250}], "Cena":[{k:"pollo",n:"Pollo",q:120}] },
+                     "Sábado": { "Desayuno":[{k:"leche",n:"Leche",q:225},{k:"pan",n:"Pan",q:70}], "Media Mañana":[{k:"yogur",n:"Yogur",q:125}], "Comida":[{k:"guisantes",n:"Guisantes",q:95},{k:"hamburguesa_ternera",n:"Hamburguesa",q:130}], "Merienda":[{k:"queso_batido",n:"Queso Batido",q:125}], "Cena":[{k:"pavo",n:"Pavo",q:175}] },
+                     "Domingo": { "Desayuno":[{k:"leche",n:"Leche",q:150},{k:"pan",n:"Pan",q:40}], "Media Mañana":[{k:"pan_molde",n:"Tostada",q:120}], "Comida":[{k:"patata",n:"Puré",q:150},{k:"burger_pollo_90",n:"Hamburguesa",q:150}], "Merienda":[{k:"yogur",n:"Yogur",q:125}], "Cena":[{k:"atun_lata",n:"Atun",q:35}] }
+                }
+            },
+            { nombre: "5-18 Mayo (PDF 22)", dias: { "Lunes": { "Desayuno":[{k:"leche",n:"Leche",q:225},{k:"pan",n:"Pan",q:60}], "Media Mañana":[{k:"platano",n:"Platano",q:1},{k:"yogur",n:"Yogur",q:1}], "Comida":[{k:"garbanzos",n:"Garbanzos",q:175},{k:"pollo",n:"Pollo",q:180}], "Merienda":[{k:"yogur",n:"Yogur",q:1}], "Cena":[{k:"atun_lata",n:"Atun",q:82},{k:"huevo",n:"Huevo",q:1}] } } },
+            { nombre: "12-27 Abril (PDF 21)", dias: { "Lunes": { "Desayuno":[{k:"yogur",n:"Yogur",q:125},{k:"pan",n:"Pan",q:60}], "Media Mañana":[{k:"almendras",n:"Almendras",q:15}], "Comida":[{k:"lentejas",n:"Lentejas",q:100},{k:"pollo",n:"Pollo",q:120}], "Merienda":[{k:"yogur",n:"Yogur",q:125}], "Cena":[{k:"huevo",n:"Tortilla",q:1},{k:"claras",n:"Claras",q:70}] } } },
+            { nombre: "1-13 Abril (PDF 20)", dias: { "Lunes": { "Desayuno":[{k:"leche",n:"Leche",q:150},{k:"pan",n:"Pan",q:125}], "Media Mañana":[{k:"pan",n:"Sandwich",q:30}], "Comida":[{k:"lentejas",n:"Lentejas",q:175},{k:"pollo",n:"Pollo",q:150}], "Merienda":[{k:"yogur",n:"Yogur",q:125}], "Cena":[{k:"atun_lata",n:"Atun",q:82}] } } },
+            { nombre: "17-31 Marzo (PDF 19)", dias: { "Lunes": { "Desayuno":[{k:"leche",n:"Leche",q:400},{k:"pan",n:"Pan",q:125}], "Media Mañana":[{k:"pan",n:"Bocadillo",q:100},{k:"pavo",n:"Pavo",q:150}], "Comida":[{k:"lentejas",n:"Lentejas",q:275},{k:"pollo",n:"Pollo",q:240}], "Merienda":[{k:"yogur",n:"Yogur",q:125}], "Cena":[{k:"atun_lata",n:"Atun",q:55}] } } },
+            { nombre: "3-16 Marzo (PDF 18)", dias: { "Lunes": { "Desayuno":[{k:"pan",n:"Pan",q:100},{k:"jamon_serrano",n:"Jamon",q:45}], "Media Mañana":[{k:"platano",n:"Platano",q:1}], "Comida":[{k:"salmon",n:"Salmon",q:220}], "Merienda":[{k:"pan",n:"Bocadillo",q:100}], "Cena":[{k:"huevo",n:"Revuelto",q:2}] } } },
+            { nombre: "16 Feb - 2 Mar (PDF 17)", dias: { "Lunes": { "Desayuno":[{k:"leche",n:"Leche",q:150},{k:"pan",n:"Pan",q:125}], "Media Mañana":[{k:"pan",n:"Bocadillo",q:100}], "Comida":[{k:"garbanzos",n:"Garbanzos",q:120},{k:"langostinos",n:"Langostinos",q:170}], "Merienda":[{k:"pan",n:"Bocadillo",q:40}], "Cena":[{k:"huevo",n:"Revuelto",q:2}] } } },
+            { nombre: "3-16 Febrero (PDF 16)", dias: { "Lunes": { "Desayuno":[{k:"leche",n:"Leche",q:225},{k:"pan",n:"Pan",q:125}], "Media Mañana":[{k:"pan",n:"Bocadillo",q:70}], "Comida":[{k:"lentejas",n:"Lentejas",q:100},{k:"burger_pollo_90",n:"Hamburguesa",q:180}], "Merienda":[{k:"pan",n:"Tostada",q:90}], "Cena":[{k:"huevo",n:"Tortilla",q:2}] } } },
+            { nombre: "20 Ene - 2 Feb (PDF 15)", dias: { "Lunes": { "Desayuno":[{k:"leche",n:"Leche",q:400},{k:"pan",n:"Pan",q:125}], "Media Mañana":[{k:"arroz",n:"Arroz",q:70}], "Comida":[{k:"lentejas",n:"Lentejas",q:100},{k:"ternera",n:"Ternera",q:150}], "Merienda":[{k:"pan",n:"Pan",q:100}], "Cena":[{k:"huevo",n:"Revuelto",q:2}] } } },
+            { nombre: "12-26 Enero (PDF 14)", dias: { "Lunes": { "Desayuno":[{k:"leche",n:"Leche",q:300},{k:"pan",n:"Pan",q:70}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"pan",n:"Bocadillo",q:40},{k:"tortilla",n:"Tortilla",q:1}], "Merienda":[{k:"yogur",n:"Yogur",q:1}], "Cena":[{k:"pavo",n:"Pavo",q:100}] } } },
+            { nombre: "Plan 13 - Alta Proteína", dias: { "Lunes": { "Desayuno":[{k:"leche",n:"Leche",q:225},{k:"pan",n:"Pan",q:70}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"pavo",n:"Pavo",q:130}], "Merienda":[{k:"yogur",n:"Yogur",q:1}], "Cena":[{k:"atun_lata",n:"Atun",q:150}] } } },
+            { nombre: "17 Dic - 1 Ene 2024 (PDF 12)", dias: { "Lunes": { "Desayuno":[{k:"leche",n:"Leche",q:225},{k:"pan",n:"Pan",q:100}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"guisantes",n:"Guisantes",q:200},{k:"pollo",n:"Pollo",q:150}], "Merienda":[{k:"yogur",n:"Yogur",q:1}], "Cena":[{k:"hamburguesa_ternera",n:"Hamburguesa",q:200}] } } },
+            { nombre: "3-17 Noviembre 2024 (PDF 11)", dias: { "Lunes": { "Desayuno":[{k:"leche",n:"Leche",q:300},{k:"pan",n:"Pan",q:90}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"lentejas",n:"Lentejas",q:100},{k:"pollo",n:"Pollo",q:250}], "Merienda":[{k:"yogur",n:"Yogur",q:1}], "Cena":[{k:"huevo",n:"Tortilla",q:1},{k:"queso_fresco",n:"Queso",q:60}] } } },
+            { nombre: "21 Oct - 3 Nov 2024", dias: { "Lunes": { "Desayuno":[{k:"leche",n:"Leche",q:225},{k:"pan",n:"Pan",q:125}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"patata",n:"Patata",q:200},{k:"pollo",n:"Pollo",q:275}], "Merienda":[{k:"yogur",n:"Yogur",q:1}], "Cena":[{k:"pan",n:"Pan",q:125},{k:"atun_lata",n:"Atun",q:35}] } } },
+            { nombre: "6-20 Octubre 2023", dias: { "Lunes": { "Desayuno":[{k:"leche",n:"Leche",q:300},{k:"pan",n:"Pan",q:40}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"garbanzos",n:"Garbanzos",q:130}], "Merienda":[{k:"yogur",n:"Yogur",q:1}], "Cena":[{k:"pollo",n:"Pollo",q:120}] } } },
+            { nombre: "14-28 Diciembre 2025", dias: { "Lunes": { "Desayuno":[{k:"pan",n:"Pan",q:60},{k:"huevo",n:"Huevo",q:4}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"garbanzos",n:"Garbanzos",q:120}], "Merienda":[{k:"yogur",n:"Yogur",q:1}], "Cena":[{k:"bacalao",n:"Bacalao",q:200}] } } },
+            { nombre: "24 Nov - 8 Dic 2025", dias: { "Lunes": { "Desayuno":[{k:"queso_ricotta",n:"Ricotta",q:150}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"pasta",n:"Pasta",q:40},{k:"langostinos",n:"Langostinos",q:50}], "Merienda":[{k:"yogur",n:"Yogur",q:1}], "Cena":[{k:"bacalao",n:"Bacalao",q:200}] } } },
+            { nombre: "Maldo Diciembre (Volumen)", dias: { "Lunes": { "Desayuno":[{k:"pan",n:"Pan",q:60},{k:"huevo",n:"Huevo",q:4}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"garbanzos",n:"Garbanzos",q:120},{k:"atun_lata",n:"Atun",q:112}], "Merienda":[{k:"yogur",n:"Yogur",q:1}], "Cena":[{k:"bacalao",n:"Bacalao",q:200}] } } },
+            { nombre: "Maldo Noviembre (Definición)", dias: { "Lunes": { "Desayuno":[{k:"queso_ricotta",n:"Ricotta",q:150}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"pasta",n:"Pasta",q:40},{k:"langostinos",n:"Langostinos",q:50}], "Merienda":[{k:"yogur",n:"Yogur",q:1}], "Cena":[{k:"bacalao",n:"Bacalao",q:200}] } } },
+            { nombre: "20 Oct - 2 Nov", dias: { "Lunes": { "Desayuno":[{k:"leche",n:"Leche",q:200},{k:"pan",n:"Pan",q:80}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"patata",n:"Patata",q:490}], "Merienda":[{k:"yogur",n:"Yogur",q:1}], "Cena":[{k:"huevo",n:"Tortilla",q:2}] } } },
+            { nombre: "1-15 Diciembre 2024", dias: { "Lunes": { "Desayuno":[{k:"leche",n:"Leche",q:225},{k:"pan",n:"Pan",q:70}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"pavo",n:"Pavo",q:130}], "Merienda":[{k:"yogur",n:"Yogur",q:1}], "Cena":[{k:"atun_lata",n:"Atun",q:150}] } } }
+        ];
+
+        return {
+            selectedPlanIdx: 0,
+            currentDay: 'Lunes',
+            weekDays: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'],
+            mealOrder: ['Desayuno', 'Media Mañana', 'Comida', 'Merienda', 'Cena'],
+            plans: plans,
+            dayData: null,
+            totals: { p:0, f:0, c:0, kcal:0 },
+            db: db,
+            weights: WEIGHTS,
+            hasData: false,
+
+            initApp() {
+                this.$nextTick(() => { this.loadPlan(); });
+            },
+
+            loadPlan() {
+                const plan = this.plans[this.selectedPlanIdx];
+                if (!plan) return;
+
+                let rawData = plan.dias[this.currentDay];
+                if (!rawData) rawData = plan.dias['Lunes'];
+                
+                this.dayData = JSON.parse(JSON.stringify(rawData));
+                this.hasData = true;
+                this.calculateTotals();
+            },
+
+            setDay(day) {
+                this.currentDay = day;
+                this.loadPlan();
+            },
+
+            calc(key, qty) {
+                const item = db[key];
+                if (!item) return { p:0, f:0, c:0, kcal:0 };
+                let grams = qty;
+                if(WEIGHTS[key] && qty < 10) grams = qty * WEIGHTS[key];
+                return {
+                    p: (item.p*grams)/100, f: (item.f*grams)/100, c: (item.c*grams)/100, kcal: (item.k*grams)/100
+                };
+            },
+
+            getMealKcal(ingredients) {
+                if(!ingredients) return 0;
+                return Math.round(ingredients.reduce((a,c) => a + this.calc(c.k, c.q).kcal, 0));
+            },
+
+            calculateTotals() {
+                this.totals = { p:0, f:0, c:0, kcal:0 };
+                if(!this.dayData) return;
+                this.mealOrder.forEach(m => {
+                    if(this.dayData[m]) {
+                        this.dayData[m].forEach(i => {
+                            const mac = this.calc(i.k, i.q);
+                            this.totals.p += mac.p; this.totals.f += mac.f; this.totals.c += mac.c; this.totals.kcal += mac.kcal;
+                        });
+                    }
+                });
+            },
+
+            getUnit(k) {
+                if(['leche','cafe'].includes(k)) return 'ml';
+                if(WEIGHTS[k]) return 'ud';
+                return 'g';
+            },
+
+            getMealColor(name) {
+                const n = name.toLowerCase();
+                if(n.includes('desayuno')) return 'bg-amber-400';
+                if(n.includes('media')) return 'bg-orange-300';
+                if(n.includes('comida')) return 'bg-emerald-500';
+                if(n.includes('merienda')) return 'bg-purple-400';
+                if(n.includes('cena')) return 'bg-indigo-500';
+                return 'bg-gray-400';
+            }
+        }
+    }
+</script>
+</body>
+</html>

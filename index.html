@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NutriMaster Pro - Colección Completa V38</title>
+    <title>NutriMaster Pro - Colección V38 (27 Planes)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         [x-cloak] { display: none !important; }
-        body { font-family: system-ui, -apple-system, sans-serif; background-color: #f8fafc; color: #1e293b; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: #f8fafc; color: #1e293b; }
         .meal-card { background: white; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         .day-btn { @apply flex-1 py-2 px-1 rounded-lg text-[10px] font-bold uppercase tracking-wider border border-slate-200 bg-white text-slate-500 transition-all; }
         .day-btn.active { @apply bg-emerald-500 text-white border-emerald-500 shadow-md transform scale-105; }
@@ -26,7 +26,7 @@
                 <div class="w-10 h-10 bg-emerald-500 rounded-lg flex items-center justify-center text-white font-bold text-xl"><i class="fas fa-layer-group"></i></div>
                 <div>
                     <h1 class="text-lg font-black tracking-tight">NUTRI<span class="text-emerald-400">MASTER</span></h1>
-                    <p class="text-[10px] text-slate-400 font-bold uppercase">V38 • ALL-IN-ONE</p>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase">V38 • 27 PLANES CARGADOS</p>
                 </div>
             </div>
             <div class="text-right">
@@ -71,7 +71,7 @@
 
         <div class="space-y-3">
             <template x-for="mealName in mealOrder" :key="mealName">
-                <div class="meal-card" x-show="dayData && dayData[mealName] && dayData[mealName].length > 0">
+                <div class="meal-card" x-show="dayData && dayData[mealName]">
                     <div class="px-4 py-2 border-b border-slate-100 flex justify-between items-center bg-slate-50/50 rounded-t-xl">
                         <h3 class="font-black text-slate-700 text-[10px] uppercase tracking-widest flex items-center gap-2">
                             <span class="w-2 h-2 rounded-full" :class="getMealColor(mealName)"></span>
@@ -80,22 +80,29 @@
                         <span class="text-[9px] font-bold text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200" x-text="getMealKcal(dayData[mealName]) + ' kcal'"></span>
                     </div>
                     <ul class="divide-y divide-slate-50">
-                        <template x-for="ing in dayData[mealName]" :key="ing.n">
-                            <li class="px-4 py-2.5 flex justify-between items-center hover:bg-slate-50">
-                                <div>
-                                    <div class="font-bold text-slate-800 text-xs" x-text="ing.n"></div>
-                                    <div class="flex gap-2 text-[9px] font-semibold text-slate-400" x-show="db[ing.k]">
-                                        <span class="text-blue-400">P:<span x-text="Math.round(calc(ing.k, ing.q).p)"></span></span>
-                                        <span class="text-rose-400">C:<span x-text="Math.round(calc(ing.k, ing.q).c)"></span></span>
-                                        <span class="text-amber-400">G:<span x-text="Math.round(calc(ing.k, ing.q).f)"></span></span>
+                        <template x-if="dayData[mealName].length > 0">
+                            <template x-for="ing in dayData[mealName]" :key="ing.n">
+                                <li class="px-4 py-2.5 flex justify-between items-center hover:bg-slate-50">
+                                    <div>
+                                        <div class="font-bold text-slate-800 text-xs" x-text="ing.n"></div>
+                                        <div class="flex gap-2 text-[9px] font-semibold text-slate-400" x-show="db[ing.k]">
+                                            <span class="text-blue-400">P:<span x-text="Math.round(calc(ing.k, ing.q).p)"></span></span>
+                                            <span class="text-rose-400">C:<span x-text="Math.round(calc(ing.k, ing.q).c)"></span></span>
+                                            <span class="text-amber-400">G:<span x-text="Math.round(calc(ing.k, ing.q).f)"></span></span>
+                                        </div>
+                                        <div x-show="!db[ing.k]" class="text-[8px] text-red-500 font-bold bg-red-50 px-1 rounded inline-block mt-0.5">
+                                            ⚠️ <span x-text="ing.k"></span> (Sin datos)
+                                        </div>
                                     </div>
-                                    <div x-show="!db[ing.k]" class="text-[8px] text-red-500 font-bold bg-red-50 px-1 rounded inline-block mt-0.5">⚠️ No en DB</div>
-                                </div>
-                                <div class="text-right">
-                                    <div class="font-black text-slate-800 text-sm" x-text="ing.q"></div>
-                                    <div class="text-[8px] uppercase text-slate-400 font-bold" x-text="getUnit(ing.k)"></div>
-                                </div>
-                            </li>
+                                    <div class="text-right">
+                                        <div class="font-black text-slate-800 text-sm" x-text="ing.q"></div>
+                                        <div class="text-[8px] uppercase text-slate-400 font-bold" x-text="getUnit(ing.k)"></div>
+                                    </div>
+                                </li>
+                            </template>
+                        </template>
+                        <template x-if="dayData[mealName].length === 0">
+                            <li class="px-4 py-3 text-center text-[10px] text-slate-400 italic">Nada pautado</li>
                         </template>
                     </ul>
                 </div>
@@ -113,7 +120,7 @@
         // 1. DATA: PESOS
         const WEIGHTS = { 'huevo': 60, 'tortilla': 1, 'yogur': 125, 'tortitas': 8, 'platano': 100, 'fruta': 150, 'manzana': 180, 'kiwi': 80, 'pan_molde': 28, 'tostada': 20, 'gelatina': 125, 'cafe': 200, 'bacon': 40, 'galletas': 6, 'tortita_trigo': 40, 'biscotes': 9 };
         
-        // 2. DATA: ALIMENTOS
+        // 2. DATA: ALIMENTOS (EXTENDIDA)
         const DB = {
             'pan': {k:260, p:8, f:2, c:50}, 'pan_integral': {k:250, p:9, f:3, c:45}, 'pan_molde': {k:260, p:8, f:3, c:48},
             'huevo': {k:143, p:12.5, f:9.5, c:0.7}, 'claras': {k:52, p:11, f:0.2, c:0.7}, 'tortilla': {k:150, p:11, f:10, c:1},
@@ -145,7 +152,7 @@
 
         // 3. DATA: PLANES (COPIA EXACTA DE LOS PDFS)
         const PLANS = [
-            // PLAN 8 DE JUNIO (Volumen Alto) [PDF 25]
+            // PLAN 25: 8 JUNIO (Volumen Alto)
             {
                 nombre: "8 Junio (Volumen Alto)",
                 dias: {
@@ -157,39 +164,41 @@
                         "Cena": [{k:"claras",n:"Revuelto Claras",q:100},{k:"huevo",n:"Huevo",q:2},{k:"yogur",n:"Yogur Griego",q:125},{k:"pan",n:"Pan",q:100}]
                     },
                     "Martes": {
-                        "Desayuno": [{k:"pan",n:"Pan",q:80},{k:"fruta",n:"Fruta",q:1},{k:"lomo_embuchado",n:"Lomo",q:25},{k:"aguacate",n:"Aguacate",q:60},{k:"cafe",n:"Café",q:1}],
+                        "Desayuno": [{k:"pan",n:"Pan",q:80},{k:"fruta",n:"Pieza Fruta",q:1},{k:"lomo_embuchado",n:"Lomo",q:25},{k:"aguacate",n:"Aguacate",q:60},{k:"cafe",n:"Café",q:1}],
                         "Media Mañana": [{k:"pan",n:"Pan",q:1}], 
                         "Comida": [{k:"pasta",n:"Pasta",q:70},{k:"ternera",n:"Ternera",q:200},{k:"queso_fundir",n:"Queso",q:45}],
                         "Merienda": [{k:"tortitas",n:"Tortitas Maíz",q:4},{k:"pavo",n:"Pavo",q:50},{k:"nueces",n:"Nueces",q:15}],
                         "Cena": [{k:"calabacin",n:"Calabacín/Cebolla",q:150},{k:"atun_lata",n:"Atún",q:120},{k:"yogur",n:"Yogur Proteico",q:125},{k:"pan",n:"Pan",q:100}]
                     },
-                    "Miércoles": { "Desayuno":[{k:"pan",n:"Pan",q:120},{k:"huevo",n:"Huevo",q:1},{k:"aguacate",n:"Aguacate",q:60}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"lentejas",n:"Lentejas",q:300},{k:"atun_lata",n:"Atun",q:120},{k:"huevo",n:"Huevo",q:2},{k:"aguacate",n:"Aguacate",q:90}], "Merienda":[{k:"platano",n:"Platano",q:1},{k:"queso_batido",n:"Queso Batido",q:90},{k:"crema_cacahuete",n:"Crema CC",q:15}], "Cena":[{k:"pollo",n:"Pollo Soja",q:150},{k:"champinones",n:"Champiñones",q:50},{k:"pan",n:"Pan",q:100}] },
-                    "Jueves": { "Desayuno":[{k:"pan",n:"Pan",q:80},{k:"fruta",n:"Fruta",q:1},{k:"pavo",n:"Pavo",q:50},{k:"aceite",n:"Aceite",q:10}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"arroz",n:"Arroz",q:70},{k:"salmon",n:"Salmón",q:160}], "Merienda":[{k:"platano",n:"Platano",q:1},{k:"queso_batido",n:"Queso Batido",q:90},{k:"crema_cacahuete",n:"Crema CC",q:15}], "Cena":[{k:"ternera",n:"Fajita Ternera",q:90},{k:"tortita_trigo",n:"Tortitas",q:2},{k:"verdura",n:"Verduras",q:100},{k:"yogur",n:"Yogur Griego",q:125},{k:"pan",n:"Pan",q:100}] },
-                    "Viernes": { "Desayuno":[{k:"pan",n:"Pan",q:40},{k:"pavo",n:"Pavo",q:50},{k:"aceite",n:"Aceite",q:10}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"verdura",n:"Revuelto Verduras",q:150},{k:"lomo",n:"Solomillo",q:160}], "Merienda":[{k:"tortitas",n:"Tortitas",q:4},{k:"pavo",n:"Pavo",q:50},{k:"nueces",n:"Nueces",q:15}], "Cena":[{k:"verdura",n:"Ensalada",q:100},{k:"huevo",n:"Huevo",q:1},{k:"atun_lata",n:"Atun",q:60},{k:"aceitunas",n:"Aceitunas",q:15},{k:"pan",n:"Pan",q:100}] },
-                    "Sábado": { "Desayuno":[{k:"pan",n:"Pan",q:120},{k:"huevo",n:"Huevo",q:1},{k:"aguacate",n:"Aguacate",q:60}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"pisto",n:"Pisto",q:100},{k:"cuscus",n:"Cuscus",q:75},{k:"pollo",n:"Pollo",q:200}], "Merienda":[{k:"pan",n:"Pan",q:80},{k:"lomo_embuchado",n:"Lomo",q:25},{k:"nueces",n:"Nueces",q:15}], "Cena":[{k:"huevo",n:"Tortilla",q:1},{k:"claras",n:"Claras",q:100},{k:"espinacas",n:"Espinacas",q:50},{k:"pan",n:"Pan",q:100}] },
+                    "Miércoles": { "Desayuno":[{k:"pan",n:"Pan",q:120},{k:"huevo",n:"Huevo",q:1},{k:"aguacate",n:"Aguacate",q:60}], "Media Mañana":[{k:"fruta",n:"Pieza Fruta",q:1}], "Comida":[{k:"lentejas",n:"Lentejas",q:300},{k:"atun_lata",n:"Atún",q:120},{k:"huevo",n:"Huevo",q:2},{k:"aguacate",n:"Aguacate",q:90}], "Merienda":[{k:"platano",n:"Plátano",q:1},{k:"queso_batido",n:"Queso Batido",q:90},{k:"crema_cacahuete",n:"Crema CC",q:15}], "Cena":[{k:"pollo",n:"Pollo Soja",q:150},{k:"champinones",n:"Champiñones",q:50},{k:"pan",n:"Pan",q:100}] },
+                    "Jueves": { "Desayuno":[{k:"pan",n:"Pan",q:80},{k:"fruta",n:"Fruta",q:1},{k:"pavo",n:"Pavo",q:50},{k:"aceite",n:"Aceite",q:10}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"arroz",n:"Arroz",q:70},{k:"salmon",n:"Salmón",q:160}], "Merienda":[{k:"platano",n:"Plátano",q:1},{k:"queso_batido",n:"Queso Batido",q:90},{k:"crema_cacahuete",n:"Crema CC",q:15}], "Cena":[{k:"ternera",n:"Fajita Ternera",q:90},{k:"tortita_trigo",n:"Tortitas",q:2},{k:"verdura",n:"Verduras",q:100},{k:"yogur",n:"Yogur Griego",q:125},{k:"pan",n:"Pan",q:100}] },
+                    "Viernes": { "Desayuno":[{k:"pan",n:"Pan",q:40},{k:"pavo",n:"Pavo",q:50},{k:"aceite",n:"Aceite",q:10}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"verdura",n:"Revuelto Verduras",q:150},{k:"lomo",n:"Solomillo",q:160}], "Merienda":[{k:"tortitas",n:"Tortitas",q:4},{k:"pavo",n:"Pavo",q:50},{k:"nueces",n:"Nueces",q:15}], "Cena":[{k:"verdura",n:"Ensalada",q:100},{k:"huevo",n:"Huevo",q:1},{k:"atun_lata",n:"Atún",q:60},{k:"aceitunas",n:"Aceitunas",q:15},{k:"pan",n:"Pan",q:100}] },
+                    "Sábado": { "Desayuno":[{k:"pan",n:"Pan",q:120},{k:"huevo",n:"Huevo",q:1},{k:"aguacate",n:"Aguacate",q:60}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"pisto",n:"Pisto",q:100},{k:"cuscus",n:"Cuscús",q:75},{k:"pollo",n:"Pollo",q:200}], "Merienda":[{k:"pan",n:"Pan",q:80},{k:"lomo_embuchado",n:"Lomo",q:25},{k:"nueces",n:"Nueces",q:15}], "Cena":[{k:"huevo",n:"Tortilla",q:1},{k:"claras",n:"Claras",q:100},{k:"espinacas",n:"Espinacas",q:50},{k:"pan",n:"Pan",q:100}] },
                     "Domingo": { "Desayuno":[{k:"pan",n:"Pan",q:80},{k:"aceite",n:"Aceite",q:10},{k:"lomo_embuchado",n:"Lomo",q:25}], "Media Mañana":[{k:"fruta",n:"Fruta",q:1}], "Comida":[{k:"arroz",n:"Arroz",q:70},{k:"burger_pollo_90",n:"Hamburguesa",q:200}], "Merienda":[{k:"tortitas",n:"Tortitas",q:4},{k:"pavo",n:"Pavo",q:50},{k:"nueces",n:"Nueces",q:15}], "Cena":[{k:"salmon",n:"Salmón",q:120},{k:"pisto",n:"Pisto",q:100},{k:"pan",n:"Pan",q:100}] }
                 }
             },
+            // PLAN 24: 9-22 JUNIO
             {
-                nombre: "9-22 Junio (PDF 24)",
+                nombre: "9-22 Junio (Mantenimiento)",
                 dias: {
                     "Lunes": { 
-                        "Desayuno":[{k:"leche",n:"Leche",q:225},{k:"pan",n:"Pan",q:70},{k:"jamon_cocido",n:"Jamón",q:30},{k:"platano",n:"Plátano",q:1},{k:"almendras",n:"Almendras",q:15}],
+                        "Desayuno":[{k:"leche",n:"Leche",q:225},{k:"pan",n:"Pan",q:70},{k:"jamon_cocido",n:"Jamón",q:30},{k:"aceite",n:"Aceite",q:10},{k:"platano",n:"Plátano",q:1},{k:"almendras",n:"Almendras",q:15}],
                         "Media Mañana":[{k:"pan_molde",n:"Tostada Integral",q:90},{k:"jamon_serrano",n:"Jamón",q:45}],
                         "Comida":[{k:"lentejas",n:"Lentejas Setas",q:175},{k:"champinones",n:"Setas",q:50},{k:"pollo",n:"Pollo",q:150},{k:"tomate",n:"Tomate",q:50},{k:"fresas",n:"Fresas",q:150}],
                         "Merienda":[{k:"fresas",n:"Fresas",q:150},{k:"yogur",n:"Yogur",q:125}],
-                        "Cena":[{k:"huevo",n:"Tortilla",q:1},{k:"claras",n:"Claras",q:70},{k:"queso_fresco",n:"Queso",q:60},{k:"manzana",n:"Manzana",q:1}]
+                        "Cena":[{k:"huevo",n:"Tortilla",q:1},{k:"claras",n:"Claras",q:70},{k:"espinacas",n:"Espinacas",q:70},{k:"queso_fresco",n:"Queso",q:60},{k:"manzana",n:"Manzana",q:1}]
                     },
                     "Martes": { "Desayuno":[{k:"leche",n:"Leche Calcio",q:150},{k:"pan_integral",n:"Pan",q:40},{k:"tomate",n:"Tomate",q:30},{k:"jamon_serrano",n:"Jamón",q:15},{k:"platano",n:"Plátano",q:1},{k:"almendras",n:"Almendras",q:15}], "Media Mañana":[{k:"queso_batido",n:"Queso Batido",q:120},{k:"avellanas",n:"Avellanas",q:15},{k:"fresas",n:"Fresas",q:120}], "Comida":[{k:"pasta",n:"Espaguetis",q:40},{k:"salmon",n:"Salmón",q:170},{k:"canonigos",n:"Canónigos",q:50},{k:"manzana",n:"Manzana",q:1}], "Merienda":[{k:"fresas",n:"Fresas",q:150},{k:"yogur",n:"Yogur",q:125}], "Cena":[{k:"burger_pollo_90",n:"Hamburguesa",q:130},{k:"pisto",n:"Pisto",q:100},{k:"platano",n:"Plátano",q:1}] },
-                    "Miércoles": { "Desayuno":[{k:"leche",n:"Leche",q:225},{k:"pan",n:"Pan",q:70},{k:"aguacate",n:"Aguacate",q:50}], "Media Mañana":[{k:"pan_molde",n:"Tostada",q:90},{k:"aguacate",n:"Aguacate",q:75}], "Comida":[{k:"lentejas",n:"Lentejas",q:80},{k:"pavo",n:"Pavo",q:200}], "Merienda":[{k:"yogur",n:"Yogur",q:125}], "Cena":[{k:"atun_lata",n:"Atun",q:100}] },
+                    "Miércoles": { "Desayuno":[{k:"leche",n:"Leche",q:225},{k:"pan",n:"Pan",q:70}], "Media Mañana":[{k:"pan_molde",n:"Tostada",q:90},{k:"aguacate",n:"Aguacate",q:75}], "Comida":[{k:"lentejas",n:"Lentejas",q:80},{k:"pavo",n:"Pavo",q:200}], "Merienda":[{k:"yogur",n:"Yogur",q:125}], "Cena":[{k:"atun_lata",n:"Atun",q:100}] },
                     "Jueves": { "Desayuno":[{k:"leche",n:"Leche",q:225},{k:"pan",n:"Pan",q:70}], "Media Mañana":[{k:"yogur",n:"Yogur",q:125},{k:"platano",n:"Platano",q:1}], "Comida":[{k:"pasta",n:"Pasta",q:40},{k:"hamburguesa_ternera",n:"Hamburguesa",q:130}], "Merienda":[{k:"yogur",n:"Yogur",q:125}], "Cena":[{k:"huevo",n:"Tortilla",q:1},{k:"claras",n:"Claras",q:35}] },
                     "Viernes": { "Desayuno":[{k:"leche",n:"Leche",q:225},{k:"pan",n:"Pan",q:70}], "Media Mañana":[{k:"pan_molde",n:"Tostada",q:90}], "Comida":[{k:"arroz",n:"Arroz",q:70},{k:"salmon",n:"Salmon",q:75}], "Merienda":[{k:"yogur",n:"Yogur",q:125}], "Cena":[{k:"pollo",n:"Pollo",q:100}] },
                     "Sábado": { "Desayuno":[{k:"leche",n:"Leche",q:225},{k:"pan",n:"Pan",q:100}], "Media Mañana":[{k:"yogur",n:"Yogur",q:250},{k:"nueces",n:"Nueces",q:10}], "Comida":[{k:"guisantes",n:"Guisantes",q:150},{k:"gambas",n:"Gambas",q:100},{k:"ternera",n:"Ternera",q:150}], "Merienda":[{k:"yogur",n:"Yogur",q:125}], "Cena":[{k:"pavo",n:"Pavo",q:125}] },
                     "Domingo": { "Desayuno":[{k:"leche",n:"Leche",q:225},{k:"pan",n:"Pan",q:70}], "Media Mañana":[{k:"pan_molde",n:"Tostada",q:90}], "Comida":[{k:"pasta",n:"Pasta",q:40},{k:"atun_lata",n:"Atun",q:100}], "Merienda":[{k:"yogur",n:"Yogur",q:125}], "Cena":[{k:"salmon",n:"Salmon",q:120}] }
                 }
             },
+            // PLAN 23: 19 MAYO
             {
-                nombre: "19 Mayo - 1 Junio (PDF 23)",
+                nombre: "19 Mayo - 1 Junio",
                 dias: {
                      "Lunes": { "Desayuno":[{k:"leche",n:"Leche",q:150},{k:"pan",n:"Pan",q:40}], "Media Mañana":[{k:"pan_molde",n:"Tostada",q:90},{k:"lomo_embuchado",n:"Lomo",q:40}], "Comida":[{k:"garbanzos",n:"Garbanzos",q:120},{k:"pollo",n:"Pollo",q:120}], "Merienda":[{k:"queso_batido",n:"Queso",q:240},{k:"nueces",n:"Nueces",q:15}], "Cena":[{k:"huevo",n:"Tortilla",q:1},{k:"jamon_cocido",n:"Jamón",q:30}] },
                      "Martes": { "Desayuno":[{k:"leche",n:"Leche",q:150},{k:"pan",n:"Pan",q:70}], "Media Mañana":[{k:"yogur",n:"Yogur",q:250},{k:"avellanas",n:"Avellanas",q:25}], "Comida":[{k:"pasta",n:"Pasta",q:60},{k:"burger_pollo_90",n:"Hamburguesa",q:130}], "Merienda":[{k:"yogur",n:"Yogur",q:125}], "Cena":[{k:"hamburguesa_ternera",n:"Hamburguesa",q:130}] },
@@ -230,7 +239,7 @@
             plans: plans,
             dayData: null,
             totals: { p:0, f:0, c:0, kcal:0 },
-            db: db,
+            db: DB,
             weights: WEIGHTS,
             hasData: false,
 
@@ -256,7 +265,7 @@
             },
 
             calc(key, qty) {
-                const item = db[key];
+                const item = DB[key];
                 if (!item) return { p:0, f:0, c:0, kcal:0 };
                 let grams = qty;
                 if(WEIGHTS[key] && qty < 10) grams = qty * WEIGHTS[key];

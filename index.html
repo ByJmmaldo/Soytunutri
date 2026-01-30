@@ -4,414 +4,251 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#000000">
     <title>MaldoFit Elite</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #09090b;
-            --surface: #18181b;
-            --surface-light: #27272a;
-            --primary: #22d3ee; /* Cyan Neon */
-            --accent: #a78bfa;  /* Purple Soft */
-            --success: #34d399; /* Green Mint */
-            --text: #fafafa;
-            --text-muted: #a1a1aa;
-            --border: #3f3f46;
+            --bg: #050505; --card: #111; --border: #222; --text: #fff; --sub: #888;
+            --main: #00f2ff; /* Neon Blue */
+            --accent: #bc13fe; /* Neon Purple */
+            --ok: #0aff60; --bad: #ff2a6d; --warn: #ffd500;
         }
-
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; padding-bottom: 100px; padding-top: env(safe-area-inset-top); height: 100vh; overflow-y: auto; }
-
-        /* --- HEADER & NAV --- */
-        header { position: sticky; top: 0; background: rgba(9,9,11,0.95); backdrop-filter: blur(12px); padding: 16px 20px; z-index: 50; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        h1 { margin: 0; font-size: 20px; font-weight: 800; letter-spacing: -0.03em; background: linear-gradient(135deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background: var(--bg); color: var(--text); margin: 0; padding: 0 0 90px 0; height: 100vh; overflow-y: auto; }
         
-        .nav-bottom { position: fixed; bottom: 0; width: 100%; background: rgba(24,24,27,0.95); backdrop-filter: blur(12px); border-top: 1px solid var(--border); display: grid; grid-template-columns: repeat(3, 1fr); padding: 12px 0 28px; z-index: 100; }
-        .nav-btn { background: none; border: none; color: var(--text-muted); font-size: 10px; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 4px; transition: color 0.2s; }
-        .nav-btn svg { width: 24px; height: 24px; fill: currentColor; }
-        .nav-btn.active { color: var(--primary); }
-
-        /* --- TABS DIAS --- */
-        .day-tabs { display: flex; overflow-x: auto; padding: 12px 20px; gap: 8px; scrollbar-width: none; }
-        .day-pill { background: var(--surface); border: 1px solid var(--border); color: var(--text-muted); padding: 8px 16px; border-radius: 99px; font-size: 13px; font-weight: 600; white-space: nowrap; transition: all 0.2s; cursor: pointer; }
-        .day-pill.active { background: var(--text); color: var(--bg); border-color: var(--text); transform: scale(1.05); }
-
-        /* --- MACRO CARDS --- */
-        .dashboard { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 0 20px 20px; }
-        .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 8px; text-align: center; }
-        .stat-val { display: block; font-size: 14px; font-weight: 800; margin-bottom: 4px; }
-        .stat-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-        .progress-bar { height: 4px; background: #333; border-radius: 2px; margin-top: 8px; overflow: hidden; }
-        .progress-fill { height: 100%; width: 0%; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
-
-        /* --- MEAL LIST --- */
-        .meal-list { padding: 0 20px; }
-        .meal-item { background: var(--surface); border-radius: 16px; padding: 16px; margin-bottom: 12px; border: 1px solid transparent; transition: border-color 0.2s; position: relative; }
-        .meal-item:active { border-color: var(--primary); }
-        .meal-cat { font-size: 10px; font-weight: 800; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
-        .meal-name { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 4px; line-height: 1.4; padding-right: 30px; }
-        .meal-macros { font-size: 12px; color: var(--text-muted); font-family: monospace; }
-        .meal-ings { font-size: 13px; color: #d4d4d8; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); line-height: 1.5; }
+        /* HEADER & TABS */
+        .head { position: sticky; top: 0; background: rgba(5,5,5,0.95); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 15px; z-index: 100; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-weight: 900; font-size: 20px; letter-spacing: -0.5px; background: linear-gradient(45deg, var(--main), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .btn-ghost { border: 1px solid var(--main); color: var(--main); background: 0 0; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; cursor: pointer; }
         
-        .btn-icon { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; position: absolute; top: 12px; right: 12px; transition: transform 0.1s; }
-        .btn-add { background: var(--primary); color: #000; }
-        .btn-del { background: rgba(255, 59, 48, 0.1); color: #ff3b30; }
-        .btn-icon:active { transform: scale(0.9); }
+        .tabs { display: flex; overflow-x: auto; gap: 8px; padding: 15px; scrollbar-width: none; }
+        .tab { background: var(--card); border: 1px solid var(--border); color: var(--sub); padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; white-space: nowrap; cursor: pointer; transition: 0.2s; }
+        .tab.active { background: var(--main); color: #000; border-color: var(--main); box-shadow: 0 0 10px rgba(0,242,255,0.3); }
 
-        /* --- LIBRARY SEARCH --- */
-        .search-container { position: sticky; top: 69px; background: var(--bg); z-index: 40; padding: 10px 20px 20px; }
-        .search-input { width: 100%; background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 12px 16px; border-radius: 12px; font-size: 15px; outline: none; transition: border-color 0.2s; }
-        .search-input:focus { border-color: var(--primary); }
-        .cat-filters { display: flex; gap: 8px; overflow-x: auto; margin-top: 12px; scrollbar-width: none; }
-        .filter-chip { background: var(--surface-light); padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; color: var(--text-muted); border: 1px solid transparent; cursor: pointer; white-space: nowrap; }
-        .filter-chip.active { background: var(--primary); color: #000; }
+        /* DASHBOARD */
+        .dash { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 0 15px 20px; }
+        .stat { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 10px 4px; text-align: center; }
+        .val { display: block; font-size: 13px; font-weight: 800; color: #fff; }
+        .lbl { font-size: 9px; color: var(--sub); text-transform: uppercase; margin-top: 3px; }
+        .bar { height: 3px; background: #333; margin-top: 6px; border-radius: 2px; overflow: hidden; }
+        .fill { height: 100%; width: 0%; transition: 0.3s ease; }
 
-        /* --- MODAL --- */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; padding: 20px; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
-        .modal-content { background: var(--surface); width: 100%; max-width: 500px; border-radius: 24px; border: 1px solid var(--border); overflow: hidden; display: flex; flex-direction: column; max-height: 90vh; }
-        .modal-header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .modal-body { padding: 20px; overflow-y: auto; }
-        .modal-footer { padding: 20px; border-top: 1px solid var(--border); background: var(--surface-light); }
-
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-        .form-group label { display: block; font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 6px; }
-        .form-control { width: 100%; background: #000; border: 1px solid var(--border); color: var(--text); padding: 10px; border-radius: 8px; font-size: 14px; }
+        /* LISTS */
+        .list { padding: 0 15px; }
+        .item { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 15px; margin-bottom: 10px; position: relative; }
+        .i-cat { font-size: 10px; font-weight: 800; color: var(--accent); text-transform: uppercase; margin-bottom: 5px; }
+        .i-name { font-size: 15px; font-weight: 600; margin-bottom: 5px; padding-right: 30px; line-height: 1.3; }
+        .i-meta { font-size: 11px; color: var(--sub); font-family: monospace; }
+        .i-ing { font-size: 12px; color: #666; margin-top: 8px; padding-top: 8px; border-top: 1px solid #222; line-height: 1.4; }
         
-        .cycle-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 8px; align-items: center; margin-bottom: 8px; }
-        .cycle-label { font-size: 13px; font-weight: 600; }
-        .cycle-input { width: 100%; background: #000; border: 1px solid var(--border); color: var(--primary); padding: 8px; border-radius: 6px; font-size: 13px; text-align: center; }
+        .act-btn { position: absolute; top: 12px; right: 12px; width: 28px; height: 28px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold; cursor: pointer; }
+        .add { background: var(--ok); color: #000; }
+        .del { background: 0 0; color: var(--bad); font-size: 22px; top: 10px; right: 10px; }
 
-        .btn-primary { width: 100%; background: var(--text); color: #000; padding: 14px; border-radius: 12px; border: none; font-weight: 700; font-size: 15px; cursor: pointer; }
-        .btn-outline { width: 100%; background: transparent; border: 1px solid var(--border); color: var(--text); padding: 14px; border-radius: 12px; font-weight: 600; cursor: pointer; }
+        /* SEARCH & LIB */
+        .search-wrap { position: sticky; top: 62px; background: var(--bg); z-index: 90; padding: 10px 15px; border-bottom: 1px solid #111; }
+        .inp-search { width: 100%; background: #1a1a1a; border: 1px solid var(--border); padding: 12px; border-radius: 10px; color: #fff; font-size: 15px; outline: none; }
+        .chips { display: flex; gap: 8px; overflow-x: auto; padding-top: 10px; padding-bottom: 5px; scrollbar-width: none; }
+        .chip { padding: 6px 12px; background: #222; border-radius: 15px; font-size: 11px; color: #aaa; white-space: nowrap; cursor: pointer; border: 1px solid transparent; }
+        .chip.active { background: var(--accent); color: #fff; }
 
-        /* VIEWS */
-        .view { display: none; }
-        .view.active { display: block; animation: fadeUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* MODAL */
+        #modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000; align-items: center; justify-content: center; }
+        .m-content { background: #111; width: 90%; max-width: 450px; padding: 25px; border-radius: 20px; border: 1px solid var(--border); max-height: 90vh; overflow-y: auto; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .f-lbl { display: block; font-size: 10px; color: var(--sub); text-transform: uppercase; font-weight: 700; margin-bottom: 5px; }
+        .f-inp { width: 100%; background: #000; border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 8px; font-size: 15px; outline: none; }
+        .btn-full { width: 100%; background: var(--main); color: #000; padding: 14px; border-radius: 10px; border: none; font-weight: 800; text-transform: uppercase; margin-top: 10px; cursor: pointer; }
+        
+        .grid-wk { display: grid; gap: 8px; margin-top: 20px; }
+        .wk-row { display: grid; grid-template-columns: 40px 1fr 1fr 1fr 1fr; gap: 5px; align-items: center; }
+        .wk-lbl { font-size: 11px; font-weight: 700; color: var(--sub); }
+        .wk-inp { width: 100%; background: #222; border: none; color: #fff; padding: 8px 4px; text-align: center; border-radius: 4px; font-size: 12px; }
 
-        /* PRINT */
-        @media print {
-            body { background: white; color: black; overflow: visible; padding: 0; }
-            .header, .nav-bottom, .day-scroll, .btn-icon, .search-container, .btn-primary, .btn-outline { display: none !important; }
-            .view { display: block !important; }
-            .meal-item { border: 1px solid #ddd; background: white; color: black; page-break-inside: avoid; box-shadow: none; margin-bottom: 10px; }
-            .meal-name { color: black; }
-            .meal-ings { color: #555; border-top: 1px solid #eee; }
-            h1 { color: black; -webkit-text-fill-color: black; }
-            #planner-list:before { content: "Plan Nutricional Semanal"; font-size: 24px; font-weight: bold; display: block; margin-bottom: 20px; }
-        }
+        /* NAV */
+        .nav { position: fixed; bottom: 0; width: 100%; background: rgba(10,10,10,0.95); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 10px 0 25px; z-index: 1000; backdrop-filter: blur(10px); }
+        .n-btn { background: 0 0; border: none; color: #555; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 10px; font-weight: 600; cursor: pointer; }
+        .n-btn.active { color: var(--main); } .icon { font-size: 20px; }
+
+        .view { display: none; } .view.active { display: block; }
+        @media print { .nav, .header, .tabs, .search-wrap, .act-btn { display: none!important; } .view { display: block!important; } body { background: #fff; color: #000; } .item { border: 1px solid #ccc; background: #fff; color: #000; break-inside: avoid; } }
     </style>
 </head>
 <body>
 
-    <div id="view-planner" class="view active">
-        <header>
-            <h1>MaldoFit</h1>
-            <button onclick="openModal()" style="background:rgba(34,211,238,0.1); color:var(--primary); border:none; padding:6px 12px; border-radius:20px; font-size:12px; font-weight:700;">OBJETIVOS</button>
-        </header>
-
-        <div class="day-scroll">
-            <div class="day-pill active" onclick="setDay('Lunes', this)">Lunes</div>
-            <div class="day-pill" onclick="setDay('Martes', this)">Martes</div>
-            <div class="day-pill" onclick="setDay('Miércoles', this)">Miércoles</div>
-            <div class="day-pill" onclick="setDay('Jueves', this)">Jueves</div>
-            <div class="day-pill" onclick="setDay('Viernes', this)">Viernes</div>
-            <div class="day-pill" onclick="setDay('Sábado', this)">Sábado</div>
-            <div class="day-pill" onclick="setDay('Domingo', this)">Domingo</div>
-        </div>
-
-        <div class="dashboard">
-            <div class="stat-card">
-                <span class="stat-val" id="val-k">0</span><span class="stat-label">Kcal</span>
-                <div class="progress-bar"><div id="bar-k" class="progress-fill" style="background:#fff"></div></div>
-            </div>
-            <div class="stat-card">
-                <span class="stat-val" id="val-p">0</span><span class="stat-label">Prot</span>
-                <div class="progress-bar"><div id="bar-p" class="progress-fill" style="background:var(--accent)"></div></div>
-            </div>
-            <div class="stat-card">
-                <span class="stat-val" id="val-c">0</span><span class="stat-label">Carb</span>
-                <div class="progress-bar"><div id="bar-c" class="progress-fill" style="background:var(--success)"></div></div>
-            </div>
-            <div class="stat-card">
-                <span class="stat-val" id="val-f">0</span><span class="stat-label">Grasa</span>
-                <div class="progress-bar"><div id="bar-f" class="progress-fill" style="background:var(--primary)"></div></div>
-            </div>
-        </div>
-
-        <div id="planner-list" class="meal-list"></div>
-        <div style="text-align:center; padding: 20px; opacity: 0.5; font-size: 12px;">Desliza hacia abajo para ver más</div>
+<div id="v-home" class="view active">
+    <div class="head"><div class="logo">MaldoFit</div><button class="btn-ghost" onclick="toggleModal(true)">OBJETIVOS</button></div>
+    <div class="tabs" id="day-tabs"></div>
+    <div class="dash">
+        <div class="stat"><span class="val" id="dk">0</span><span class="lbl">Kcal</span><div class="bar"><div id="bk" class="fill" style="background:#fff"></div></div></div>
+        <div class="stat"><span class="val" id="dp">0</span><span class="lbl">Prot</span><div class="bar"><div id="bp" class="fill" style="background:var(--bad)"></div></div></div>
+        <div class="stat"><span class="val" id="dc">0</span><span class="lbl">Carb</span><div class="bar"><div id="bc" class="fill" style="background:var(--warn)"></div></div></div>
+        <div class="stat"><span class="val" id="df">0</span><span class="lbl">Grasa</span><div class="bar"><div id="bf" class="fill" style="background:var(--ok)"></div></div></div>
     </div>
+    <div id="plan-list" class="list"></div>
+</div>
 
-    <div id="view-library" class="view">
-        <header>
-            <h1>Alimentos</h1>
-        </header>
-        <div class="search-container">
-            <input type="text" id="search" class="search-input" placeholder="Buscar plato (ej: avena, pavo)..." onkeyup="renderLib()">
-            <div class="cat-filters">
-                <div class="filter-chip active" onclick="setCat('Desayuno', this)">Desayuno</div>
-                <div class="filter-chip" onclick="setCat('Tentempié', this)">Media Mañana</div>
-                <div class="filter-chip" onclick="setCat('Comida', this)">Comida</div>
-                <div class="filter-chip" onclick="setCat('Merienda', this)">Merienda</div>
-                <div class="filter-chip" onclick="setCat('Cena', this)">Cena</div>
-            </div>
+<div id="v-lib" class="view">
+    <div class="head"><h1>Alimentos</h1></div>
+    <div class="search-wrap">
+        <input type="text" id="search" class="inp-search" placeholder="Buscar..." onkeyup="renderLib()">
+        <div class="chips" id="cat-filters"></div>
+    </div>
+    <div id="lib-list" class="list" style="padding-bottom: 100px;"></div>
+</div>
+
+<div id="modal" class="modal">
+    <div class="m-box">
+        <h2 style="color:var(--main);margin-top:0">Perfil & Objetivos</h2>
+        <div class="form-row">
+            <div><label class="f-lbl">Peso</label><input type="number" id="w" class="f-inp" value="80"></div>
+            <div><label class="f-lbl">Altura</label><input type="number" id="h" class="f-inp" value="180"></div>
         </div>
-        <div id="lib-list" class="meal-list"></div>
-    </div>
-
-    <div id="modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 style="margin:0; font-size:18px;">Configuración</h2>
-                <button onclick="closeModal()" style="background:none; border:none; color:var(--text-muted); font-size:20px;">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div style="background:var(--surface-light); padding:15px; border-radius:12px; margin-bottom:20px;">
-                    <h3 style="margin:0 0 15px 0; font-size:14px; color:var(--primary);">Calculadora Harris-Benedict</h3>
-                    <div class="form-grid">
-                        <div class="form-group"><label>Peso (kg)</label><input type="number" id="w" class="form-control" value="80"></div>
-                        <div class="form-group"><label>Altura (cm)</label><input type="number" id="h" class="form-control" value="180"></div>
-                        <div class="form-group"><label>Edad</label><input type="number" id="a" class="form-control" value="30"></div>
-                        <div class="form-group"><label>Sexo</label><select id="s" class="form-control"><option value="m">Hombre</option><option value="f">Mujer</option></select></div>
-                    </div>
-                    <div class="form-group"><label>Objetivo</label>
-                        <select id="goal" class="form-control">
-                            <option value="-0.2">Definición Agresiva (-20%)</option>
-                            <option value="-0.1">Definición Moderada (-10%)</option>
-                            <option value="0" selected>Mantenimiento</option>
-                            <option value="0.1">Volumen Limpio (+10%)</option>
-                            <option value="0.2">Volumen Agresivo (+20%)</option>
-                        </select>
-                    </div>
-                    <button class="btn-outline" onclick="calcBase()" style="margin-top:10px; font-size:12px; padding:10px;">Autocalcular todos los días</button>
-                </div>
-
-                <h3 style="margin:0 0 10px 0; font-size:14px;">Ajuste Diario Manual</h3>
-                <div id="cycle-grid">
-                    </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn-primary" onclick="saveTargets()">Guardar Cambios</button>
-            </div>
+        <div class="form-row">
+            <div><label class="f-lbl">Edad</label><input type="number" id="a" class="f-inp" value="30"></div>
+            <div><label class="f-lbl">Sexo</label><select id="s" class="f-inp"><option value="m">H</option><option value="f">M</option></select></div>
         </div>
+        <div style="margin-bottom:15px"><label class="f-lbl">Actividad</label><select id="act" class="f-inp"><option value="1.2">Sedentario</option><option value="1.375">Ligero</option><option value="1.55" selected>CrossFit (3-5d)</option><option value="1.725">Alto</option></select></div>
+        <div style="margin-bottom:15px"><label class="f-lbl">Objetivo Global</label><select id="goal" class="f-inp" style="border-color:var(--accent)"><option value="-0.2">Definición Agresiva (-20%)</option><option value="-0.1">Definición (-10%)</option><option value="0">Mantenimiento</option><option value="0.1">Volumen Limpio (+10%)</option><option value="0.2">Volumen Agresivo (+20%)</option></select></div>
+        <button class="btn-full" onclick="calcBase()">Auto-Calcular Todo</button>
+        
+        <div style="margin-top:20px;border-top:1px solid #333;padding-top:10px;">
+            <label class="f-lbl" style="color:#fff;margin-bottom:10px">Ajuste Manual por Día</label>
+            <div id="grid-wk" class="grid-wk"></div>
+        </div>
+        
+        <button class="btn-full" style="background:#333;margin-top:20px" onclick="saveConfig()">Guardar Cambios</button>
+        <button onclick="toggleModal(false)" style="width:100%;padding:15px;background:0 0;border:none;color:#666;margin-top:5px">Cancelar</button>
     </div>
+</div>
 
-    <div class="nav-bottom">
-        <button class="nav-btn active" onclick="goView('view-planner', this)">
-            <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2zm-7 5h5v5h-5v-5z"/></svg>
-            Plan
-        </button>
-        <button class="nav-btn" onclick="goView('view-library', this)">
-            <svg viewBox="0 0 24 24"><path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.66 3.84 3.75 3.97V22h2.5v-9.03C11.34 12.84 13 11.12 13 9V2h-2v7zm5-3v8h2.5v8H21V2c-2.76 0-5 2.24-5 4z"/></svg>
-            Alimentos
-        </button>
-        <button class="nav-btn" onclick="window.print()">
-            <svg viewBox="0 0 24 24"><path d="M19 8h-1V3H6v5H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zM8 5h8v3H8V5zm8 12v2H8v-2h8zm2-2v-2H6v2H4v-4c0-.55.45-1 1-1h14c.55 0 1 .45 1 1v4h-2z"/><circle cx="18" cy="11.5" r="1"/></svg>
-            PDF
-        </button>
-    </div>
+<div class="nav">
+    <button class="n-btn active" onclick="go('v-home',this)"><span class="icon">📅</span>Plan</button>
+    <button class="n-btn" onclick="go('v-lib',this)"><span class="icon">🍔</span>Alimentos</button>
+    <button class="n-btn" onclick="window.print()"><span class="icon">🖨️</span>PDF</button>
+</div>
 
-    <script src="data.js"></script> <script>
-        // --- ESTADO APP ---
-        let activeDay = "Lunes";
-        let activeCat = "Desayuno";
-        let targets = {};
-        let weeklyPlan = { "Lunes":[], "Martes":[], "Miércoles":[], "Jueves":[], "Viernes":[], "Sábado":[], "Domingo":[] };
-        const days = ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"];
+<script src="data.js"></script>
 
-        // --- INICIALIZACIÓN ---
-        window.onload = function() {
-            // Cargar Targets
-            const t = localStorage.getItem('mf_targets');
-            if(t) targets = JSON.parse(t);
-            else calcBase(); // Si es primera vez, calcula default
+<script>
+// STATE
+let state = { day:'Lunes', cat:'Desayuno', plan:{}, targets:{} };
+const DAYS = ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"];
+const CATS = ["Desayuno","Tentempié","Comida","Merienda","Cena"];
 
-            // Cargar Plan
-            const p = localStorage.getItem('mf_plan');
-            if(p) weeklyPlan = JSON.parse(p);
+// INIT
+window.onload = () => {
+    // Si foodDB no carga, avisar
+    if(typeof foodDB === 'undefined') { alert("Error: Falta el archivo data.js"); return; }
+    
+    // Init Plan Structure
+    DAYS.forEach(d => { if(!state.plan[d]) state.plan[d] = []; });
 
-            renderCycleGrid();
-            renderLib();
-            renderPlan();
+    // Load LocalStorage
+    try {
+        const t = localStorage.getItem('mf_targets_v3');
+        const p = localStorage.getItem('mf_plan_v3');
+        if(t) state.targets = JSON.parse(t); else calcBase(true);
+        if(p) state.plan = JSON.parse(p);
+    } catch(e) { calcBase(true); }
+
+    renderTabs();
+    renderCats();
+    renderPlan();
+    renderLib();
+};
+
+// LOGIC
+function calcBase(silent) {
+    const w=parseFloat(document.getElementById('w').value)||80, h=parseFloat(document.getElementById('h').value)||180, a=parseFloat(document.getElementById('a').value)||30, s=document.getElementById('s').value||'m', act=parseFloat(document.getElementById('act').value)||1.55, goal=parseFloat(document.getElementById('goal').value)||0;
+    
+    let bmr = (s==='m') ? 88.362+(13.397*w)+(4.799*h)-(5.677*a) : 447.593+(9.247*w)+(3.098*h)-(4.330*a);
+    const k=Math.round(bmr*act*(1+goal)), p=Math.round(w*2), f=Math.round(w*0.9), c=Math.round((k-p*4-f*9)/4);
+    
+    DAYS.forEach(d => state.targets[d] = {k,p,c,f});
+    if(!silent) renderGrid();
+}
+
+function renderGrid() {
+    const g = document.getElementById('grid-wk'); g.innerHTML = '';
+    // Header
+    g.innerHTML += `<div class="wk-row"><span class="wk-lbl"></span><span class="wk-lbl" style="color:#fff">KCAL</span><span class="wk-lbl" style="color:var(--bad)">PRO</span><span class="wk-lbl" style="color:var(--warn)">CAR</span><span class="wk-lbl" style="color:var(--ok)">GRA</span></div>`;
+    DAYS.forEach(d => {
+        const t = state.targets[d];
+        g.innerHTML += `<div class="wk-row"><span class="wk-lbl">${d.substr(0,3)}</span><input type="number" id="k_${d}" value="${t.k}" class="wk-inp"><input type="number" id="p_${d}" value="${t.p}" class="wk-inp" style="color:var(--bad)"><input type="number" id="c_${d}" value="${t.c}" class="wk-inp" style="color:var(--warn)"><input type="number" id="f_${d}" value="${t.f}" class="wk-inp" style="color:var(--ok)"></div>`;
+    });
+}
+
+function saveConfig() {
+    DAYS.forEach(d => {
+        state.targets[d] = {
+            k: parseInt(document.getElementById(`k_${d}`).value),
+            p: parseInt(document.getElementById(`p_${d}`).value),
+            c: parseInt(document.getElementById(`c_${d}`).value),
+            f: parseInt(document.getElementById(`f_${d}`).value)
         };
+    });
+    localStorage.setItem('mf_targets_v3', JSON.stringify(state.targets));
+    toggleModal(false);
+    renderPlan();
+}
 
-        // --- LÓGICA CALCULADORA ---
-        function calcBase() {
-            const w = parseFloat(document.getElementById('w').value);
-            const h = parseFloat(document.getElementById('h').value);
-            const a = parseFloat(document.getElementById('a').value);
-            const s = document.getElementById('s').value;
-            const goal = parseFloat(document.getElementById('goal').value);
-            
-            // Harris-Benedict
-            let bmr = (s==='m') ? 88.362 + (13.397*w) + (4.799*h) - (5.677*a) : 447.593 + (9.247*w) + (3.098*h) - (4.330*a);
-            const tdee = bmr * 1.55; // Actividad media por defecto
-            const k = Math.round(tdee * (1 + goal));
-            
-            // Macros Base
-            const p = Math.round(w * 2);
-            const f = Math.round(w * 0.9);
-            const c = Math.round((k - (p*4 + f*9)) / 4);
+// UI
+function renderTabs() {
+    const c = document.getElementById('day-tabs'); c.innerHTML='';
+    DAYS.forEach(d => c.innerHTML += `<div class="tab ${state.day===d?'active':''}" onclick="setDay('${d}')">${d}</div>`);
+}
+function renderCats() {
+    const c = document.getElementById('cat-filters'); c.innerHTML='';
+    CATS.forEach(cat => c.innerHTML += `<div class="chip ${state.cat===cat?'active':''}" onclick="setCat('${cat}')">${cat}</div>`);
+}
 
-            days.forEach(d => {
-                targets[d] = { k, p, c, f };
-            });
-            
-            renderCycleGrid(); // Mostrar en tabla para edición manual
-        }
+function setDay(d) { state.day=d; renderTabs(); renderPlan(); }
+function setCat(c) { state.cat=c; renderCats(); renderLib(); }
+function toggleModal(s) { document.getElementById('modal').style.display = s?'flex':'none'; if(s) renderGrid(); }
+function go(v,btn) { 
+    document.querySelectorAll('.view').forEach(x=>x.classList.add('hide'));
+    document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
+    document.getElementById(v).classList.remove('hide');
+    document.getElementById(v).classList.add('active');
+    document.querySelectorAll('.n-item').forEach(x=>x.classList.remove('active'));
+    btn.classList.add('active');
+}
 
-        function renderCycleGrid() {
-            const grid = document.getElementById('cycle-grid');
-            grid.innerHTML = '';
-            
-            // Header
-            grid.innerHTML += `<div class="cycle-row" style="border-bottom:1px solid #333; padding-bottom:5px; margin-bottom:10px;">
-                <span style="font-size:10px; color:#888;">DÍA</span>
-                <span style="font-size:10px; color:#fff; text-align:center;">KCAL</span>
-                <span style="font-size:10px; color:var(--accent); text-align:center;">PROT</span>
-                <span style="font-size:10px; color:var(--success); text-align:center;">CARB</span>
-                <span style="font-size:10px; color:var(--primary); text-align:center;">GRAS</span>
-            </div>`;
+function renderLib() {
+    const list = document.getElementById('lib-list'), term = document.getElementById('search').value.toLowerCase();
+    list.innerHTML = '';
+    const filtered = foodDB.filter(x => {
+        let m = x.t === state.cat;
+        if(state.cat==='Tentempié' && (x.t.includes('Mañana')||x.t.includes('M.MAÑANA'))) m=true;
+        return m && (x.n.toLowerCase().includes(term) || x.d.toLowerCase().includes(term));
+    });
+    
+    filtered.forEach(x => {
+        list.innerHTML += `<div class="item"><div class="i-cat">${x.t}</div><div class="i-name">${x.n}</div><div class="i-det">🔥${x.k} P${x.p} C${x.c} F${x.f}</div><div class="i-ing">${x.d}</div><button class="act add" onclick="add(${x.i})">+</button></div>`;
+    });
+}
 
-            days.forEach(d => {
-                const t = targets[d] || {k:2500, p:160, c:300, f:70};
-                grid.innerHTML += `
-                    <div class="cycle-row">
-                        <span class="cycle-label">${d}</span>
-                        <input type="number" id="k-${d}" class="cycle-input" value="${t.k}" style="color:white">
-                        <input type="number" id="p-${d}" class="cycle-input" value="${t.p}" style="color:var(--accent)">
-                        <input type="number" id="c-${d}" class="cycle-input" value="${t.c}" style="color:var(--success)">
-                        <input type="number" id="f-${d}" class="cycle-input" value="${t.f}" style="color:var(--primary)">
-                    </div>
-                `;
-            });
-        }
+function renderPlan() {
+    const list = document.getElementById('plan-list'); list.innerHTML = '';
+    let tot = {k:0,p:0,c:0,f:0};
+    (state.plan[state.day]||[]).forEach((x, idx) => {
+        tot.k+=x.k; tot.p+=x.p; tot.c+=x.c; tot.f+=x.f;
+        list.innerHTML += `<div class="item"><div class="i-cat">${x.t}</div><div class="i-name">${x.n}</div><div class="i-det">🔥${x.k} P${x.p} C${x.c} F${x.f}</div><button class="act del" onclick="del(${idx})">×</button></div>`;
+    });
+    
+    const t = state.targets[state.day] || {k:2500,p:160,c:300,f:70};
+    updBar('k', tot.k, t.k); updBar('p', tot.p, t.p); updBar('c', tot.c, t.c); updBar('f', tot.f, t.f);
+    localStorage.setItem('mf_plan_v3', JSON.stringify(state.plan));
+}
 
-        function saveTargets() {
-            days.forEach(d => {
-                targets[d] = {
-                    k: parseInt(document.getElementById(`k-${d}`).value),
-                    p: parseInt(document.getElementById(`p-${d}`).value),
-                    c: parseInt(document.getElementById(`c-${d}`).value),
-                    f: parseInt(document.getElementById(`f-${d}`).value)
-                };
-            });
-            localStorage.setItem('mf_targets', JSON.stringify(targets));
-            closeModal();
-            renderPlan(); // Actualizar barras home
-        }
+function updBar(k, v, max) {
+    document.getElementById('d'+k).innerText = `${v} / ${max}`;
+    document.getElementById('b'+k).style.width = Math.min((v/max)*100, 100) + '%';
+}
 
-        // --- NAVEGACIÓN ---
-        function goView(viewId, btn) {
-            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            document.getElementById(viewId).classList.add('active');
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-        }
-
-        function setDay(d, pill) {
-            activeDay = d;
-            document.querySelectorAll('.day-pill').forEach(p => p.classList.remove('active'));
-            pill.classList.add('active');
-            renderPlan();
-        }
-
-        function setCat(c, chip) {
-            activeCat = c;
-            document.querySelectorAll('.filter-chip').forEach(f => f.classList.remove('active'));
-            chip.classList.add('active');
-            renderLib();
-        }
-
-        // --- RENDERIZADO ---
-        function renderLib() {
-            const list = document.getElementById('lib-list');
-            const term = document.getElementById('search').value.toLowerCase();
-            list.innerHTML = '';
-
-            // Si foodDB no existe (por si el usuario no cargó el js), evitar crash
-            if (typeof foodDB === 'undefined') {
-                list.innerHTML = '<p style="text-align:center; color:red;">Error: data.js no cargado.</p>';
-                return;
-            }
-
-            const filtered = foodDB.filter(x => {
-                let matchCat = x.type === activeCat;
-                // Mapeo flexible
-                if(activeCat === 'Tentempié' && (x.type.includes('Mañana') || x.type.includes('M.MAÑANA'))) matchCat = true;
-                return matchCat && (x.name.toLowerCase().includes(term) || x.ings.toLowerCase().includes(term));
-            });
-
-            filtered.forEach(x => {
-                const div = document.createElement('div');
-                div.className = 'meal-item';
-                div.innerHTML = `
-                    <div class="meal-cat">${x.type}</div>
-                    <div class="meal-name">${x.name}</div>
-                    <div class="meal-macros">🔥${x.kcal} · P${x.p} · C${x.c} · F${x.f}</div>
-                    <div class="meal-ings">${x.ings}</div>
-                    <button class="btn-action btn-add" onclick="addFood(${x.id})">+</button>
-                `;
-                list.appendChild(div);
-            });
-        }
-
-        function renderPlan() {
-            const list = document.getElementById('planner-list');
-            list.innerHTML = '';
-            let t = {k:0, p:0, c:0, f:0};
-
-            weeklyPlan[activeDay].forEach((x, idx) => {
-                t.k += x.kcal; t.p += x.p; t.c += x.c; t.f += x.f;
-                const div = document.createElement('div');
-                div.className = 'meal-item';
-                div.innerHTML = `
-                    <div class="meal-cat">${x.type}</div>
-                    <div class="meal-name">${x.name}</div>
-                    <div class="meal-macros">🔥${x.kcal} · P${x.p} · C${x.c} · F${x.f}</div>
-                    <div class="meal-ings">${x.ings}</div>
-                    <button class="btn-action btn-del" onclick="delFood(${idx})">&times;</button>
-                `;
-                list.appendChild(div);
-            });
-
-            // Update Stats Bar
-            const tgt = targets[activeDay] || {k:2500, p:160, c:300, f:70};
-            updateBar('k', t.k, tgt.k);
-            updateBar('p', t.p, tgt.p);
-            updateBar('c', t.c, tgt.c);
-            updateBar('f', t.f, tgt.f);
-        }
-
-        function updateBar(key, val, max) {
-            document.getElementById(`val-${key}`).innerText = `${val} / ${max}`;
-            const pct = Math.min((val/max)*100, 100);
-            document.getElementById(`bar-${key}`).style.width = `${pct}%`;
-        }
-
-        // --- ACCIONES ---
-        function addFood(id) {
-            const item = foodDB.find(x => x.id === id);
-            weeklyPlan[activeDay].push(item);
-            savePlan();
-            renderPlan();
-        }
-
-        function delFood(idx) {
-            weeklyPlan[activeDay].splice(idx, 1);
-            savePlan();
-            renderPlan();
-        }
-
-        function savePlan() {
-            localStorage.setItem('mf_plan', JSON.stringify(weeklyPlan));
-        }
-
-        function openModal() { document.getElementById('modal').style.display='flex'; }
-        function closeModal() { document.getElementById('modal').style.display='none'; }
-
-    </script>
+function add(id) { state.plan[state.day].push(foodDB.find(x=>x.i===id)); renderPlan(); }
+function del(idx) { state.plan[state.day].splice(idx,1); renderPlan(); }
+</script>
 </body>
 </html>

@@ -2,225 +2,416 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NutriMaster - Sistema Modular</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <script src="planes_db.js"></script>
-</head>
-<body class="bg-gray-100 text-slate-800 font-sans antialiased">
-
-    <div id="error-screen" class="fixed inset-0 bg-red-50 z-50 flex items-center justify-center p-10 hidden">
-        <div class="max-w-md text-center">
-            <h2 class="text-2xl font-bold text-red-600 mb-2">⚠️ Error de Datos</h2>
-            <p class="text-slate-600">No se ha encontrado el archivo <strong>planes_db.js</strong> o tiene errores de sintaxis.</p>
-            <p class="text-xs text-slate-400 mt-4">Asegúrate de que 'planes_db.js' está en la misma carpeta que 'index.html'.</p>
-        </div>
-    </div>
-
-    <div x-data="app()" x-init="initApp()" class="max-w-3xl mx-auto min-h-screen bg-white shadow-2xl flex flex-col relative z-10">
-        
-        <div class="bg-slate-900 text-white p-4 sticky top-0 z-40 shadow-lg">
-            <div class="flex justify-between items-center mb-4">
-                <div>
-                    <h1 class="text-lg font-black tracking-tight italic">NUTRI<span class="text-emerald-400">MASTER</span></h1>
-                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
-                        <span x-text="plans.length">0</span> Planes Cargados
-                    </p>
-                </div>
-                <div class="text-right">
-                    <div class="text-3xl font-black leading-none" x-text="Math.round(totals.kcal)">0</div>
-                    <div class="text-[9px] font-bold text-emerald-400 uppercase tracking-widest">Kcal <span x-text="currentDay"></span></div>
-                </div>
-            </div>
-
-            <select x-model="selectedPlanIdx" @change="loadPlan()" class="w-full bg-slate-800 border-none text-white text-sm rounded-lg py-3 px-4 font-bold ring-1 ring-slate-700 focus:ring-emerald-500 outline-none mb-3">
-                <template x-for="(plan, index) in plans" :key="index">
-                    <option :value="index" x-text="plan.nombre"></option>
-                </template>
-            </select>
-
-            <div class="flex gap-1 overflow-x-auto pb-1 scrollbar-hide">
-                <template x-for="day in weekDays" :key="day">
-                    <button @click="setDay(day)" 
-                        class="flex-1 py-2 rounded text-[10px] font-bold uppercase transition-all border"
-                        :class="currentDay === day ? 'bg-emerald-500 border-emerald-500 text-white shadow' : 'bg-slate-800 border-slate-700 text-slate-400'">
-                        <span x-text="day.substring(0,3)"></span>
-                    </button>
-                </template>
-            </div>
-        </div>
-
-        <div class="flex-1 p-4 overflow-y-auto pb-24">
-            
-            <div class="grid grid-cols-3 gap-2 mb-6">
-                <div class="bg-blue-50 p-2 rounded-lg border border-blue-100 text-center">
-                    <div class="text-blue-600 font-black text-lg" x-text="Math.round(totals.p)">0</div>
-                    <div class="text-[8px] text-blue-400 font-bold uppercase">Proteína</div>
-                </div>
-                <div class="bg-amber-50 p-2 rounded-lg border border-amber-100 text-center">
-                    <div class="text-amber-600 font-black text-lg" x-text="Math.round(totals.f)">0</div>
-                    <div class="text-[8px] text-amber-400 font-bold uppercase">Grasa</div>
-                </div>
-                <div class="bg-rose-50 p-2 rounded-lg border border-rose-100 text-center">
-                    <div class="text-rose-600 font-black text-lg" x-text="Math.round(totals.c)">0</div>
-                    <div class="text-[8px] text-rose-400 font-bold uppercase">Carbs</div>
-                </div>
-            </div>
-
-            <div class="space-y-4">
-                <template x-for="mealName in mealOrder" :key="mealName">
-                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden" 
-                         x-show="shouldShowMeal(mealName)">
-                        
-                        <div class="px-4 py-2 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                            <h3 class="font-black text-slate-700 text-[10px] uppercase tracking-widest flex items-center gap-2">
-                                <span class="w-2 h-2 rounded-full" :class="getMealColor(mealName)"></span>
-                                <span x-text="mealName"></span>
-                            </h3>
-                            <span class="text-[9px] font-bold text-slate-400" x-text="getMealKcal(dayData[mealName]) + ' kcal'"></span>
-                        </div>
-
-                        <ul class="divide-y divide-slate-50">
-                            <template x-for="ing in dayData[mealName]" :key="ing.n">
-                                <li class="px-4 py-2.5 flex justify-between items-center">
-                                    <div>
-                                        <div class="font-bold text-xs text-slate-800" x-text="ing.n"></div>
-                                        <div class="flex gap-2 text-[9px] font-medium text-slate-400" x-show="db[ing.k]">
-                                            <span x-text="'P:' + Math.round(calc(ing).p)"></span>
-                                            <span x-text="'C:' + Math.round(calc(ing).c)"></span>
-                                            <span x-text="'G:' + Math.round(calc(ing).f)"></span>
-                                        </div>
-                                        <div x-show="!db[ing.k]" class="text-[8px] text-red-400 font-bold bg-red-50 px-1 rounded inline-block">⚠️ Sin datos</div>
-                                    </div>
-                                    <div class="text-right">
-                                        <div class="font-black text-sm text-slate-900" x-text="ing.q"></div>
-                                        <div class="text-[8px] font-bold text-slate-400 uppercase" x-text="getUnit(ing.k)"></div>
-                                    </div>
-                                </li>
-                            </template>
-                        </ul>
-                    </div>
-                </template>
-                
-                <div x-show="!hasData" class="text-center py-12 text-slate-400 text-sm">
-                    <i class="fas fa-spinner fa-spin mb-2 text-2xl text-emerald-500"></i><br>
-                    Cargando base de datos...
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        function app() {
-            return {
-                db: {},
-                plans: [],
-                weights: {},
-                selectedPlanIdx: 0,
-                currentDay: 'Lunes',
-                weekDays: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'],
-                mealOrder: ['Desayuno', 'Media Mañana', 'Comida', 'Merienda', 'Cena'],
-                dayData: {},
-                totals: { p:0, f:0, c:0, kcal:0 },
-                hasData: false,
-
-                initApp() {
-                    // Verificación de seguridad
-                    if (typeof window.NUTRI_DB === 'undefined' || typeof window.NUTRI_PLANS === 'undefined') {
-                        document.getElementById('error-screen').classList.remove('hidden');
-                        return;
-                    }
-
-                    // Carga de datos externos
-                    this.db = window.NUTRI_DB;
-                    this.plans = window.NUTRI_PLANS;
-                    this.weights = window.NUTRI_WEIGHTS;
-
-                    // Seleccionar último plan
-                    if (this.plans.length > 0) this.selectedPlanIdx = this.plans.length - 1;
-                    
-                    this.loadPlan();
-                },
-
-                loadPlan() {
-                    const plan = this.plans[this.selectedPlanIdx];
-                    if (!plan) return;
-
-                    let rawData = plan.dias[this.currentDay];
-                    // Si el día está vacío, usar un fallback vacío pero seguro
-                    if (!rawData) rawData = {}; 
-
-                    this.dayData = JSON.parse(JSON.stringify(rawData));
-                    this.hasData = true;
-                    this.calculateTotals();
-                },
-
-                setDay(day) {
-                    this.currentDay = day;
-                    this.loadPlan();
-                },
-
-                shouldShowMeal(mealName) {
-                    return this.dayData[mealName] && this.dayData[mealName].length > 0;
-                },
-
-                calc(ing) {
-                    const item = this.db[ing.k];
-                    if (!item) return { p:0, f:0, c:0, kcal:0 };
-                    
-                    let grams = ing.q;
-                    // Conversión inteligente de unidades
-                    if (this.weights[ing.k] && ing.q < 10) {
-                        grams = ing.q * this.weights[ing.k];
-                    }
-
-                    return {
-                        p: (item.p * grams) / 100,
-                        f: (item.f * grams) / 100,
-                        c: (item.c * grams) / 100,
-                        kcal: (item.k * grams) / 100
-                    };
-                },
-
-                getMealKcal(ingredients) {
-                    if (!ingredients) return 0;
-                    return Math.round(ingredients.reduce((acc, curr) => acc + this.calc(curr).kcal, 0));
-                },
-
-                calculateTotals() {
-                    this.totals = { p:0, f:0, c:0, kcal:0 };
-                    this.mealOrder.forEach(meal => {
-                        if (this.dayData[meal]) {
-                            this.dayData[meal].forEach(ing => {
-                                const m = this.calc(ing);
-                                this.totals.p += m.p;
-                                this.totals.f += m.f;
-                                this.totals.c += m.c;
-                                this.totals.kcal += m.kcal;
-                            });
-                        }
-                    });
-                },
-
-                getUnit(k) {
-                    if (['leche','cafe','caldo'].includes(k)) return 'ml';
-                    if (this.weights[k]) return 'ud';
-                    return 'g';
-                },
-
-                getMealColor(name) {
-                    const n = name.toLowerCase();
-                    if(n.includes('desayuno')) return 'bg-amber-400';
-                    if(n.includes('media')) return 'bg-orange-300';
-                    if(n.includes('comida')) return 'bg-emerald-500';
-                    if(n.includes('merienda')) return 'bg-purple-400';
-                    if(n.includes('cena')) return 'bg-indigo-500';
-                    return 'bg-gray-300';
-                }
-            }
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>MaldoFit Elite</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #09090b;
+            --surface: #18181b;
+            --surface-light: #27272a;
+            --primary: #22d3ee; /* Cyan Neon */
+            --accent: #a78bfa;  /* Purple Soft */
+            --success: #34d399; /* Green Mint */
+            --text: #fafafa;
+            --text-muted: #a1a1aa;
+            --border: #3f3f46;
         }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; padding-bottom: 100px; padding-top: env(safe-area-inset-top); height: 100vh; overflow-y: auto; }
+
+        /* --- HEADER & NAV --- */
+        header { position: sticky; top: 0; background: rgba(9,9,11,0.95); backdrop-filter: blur(12px); padding: 16px 20px; z-index: 50; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        h1 { margin: 0; font-size: 20px; font-weight: 800; letter-spacing: -0.03em; background: linear-gradient(135deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        .nav-bottom { position: fixed; bottom: 0; width: 100%; background: rgba(24,24,27,0.95); backdrop-filter: blur(12px); border-top: 1px solid var(--border); display: grid; grid-template-columns: repeat(3, 1fr); padding: 12px 0 28px; z-index: 100; }
+        .nav-btn { background: none; border: none; color: var(--text-muted); font-size: 10px; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 4px; transition: color 0.2s; }
+        .nav-btn svg { width: 24px; height: 24px; fill: currentColor; }
+        .nav-btn.active { color: var(--primary); }
+
+        /* --- TABS DIAS --- */
+        .day-tabs { display: flex; overflow-x: auto; padding: 12px 20px; gap: 8px; scrollbar-width: none; }
+        .day-pill { background: var(--surface); border: 1px solid var(--border); color: var(--text-muted); padding: 8px 16px; border-radius: 99px; font-size: 13px; font-weight: 600; white-space: nowrap; transition: all 0.2s; cursor: pointer; }
+        .day-pill.active { background: var(--text); color: var(--bg); border-color: var(--text); transform: scale(1.05); }
+
+        /* --- MACRO CARDS --- */
+        .dashboard { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 0 20px 20px; }
+        .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 8px; text-align: center; }
+        .stat-val { display: block; font-size: 14px; font-weight: 800; margin-bottom: 4px; }
+        .stat-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .progress-bar { height: 4px; background: #333; border-radius: 2px; margin-top: 8px; overflow: hidden; }
+        .progress-fill { height: 100%; width: 0%; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        /* --- MEAL LIST --- */
+        .meal-list { padding: 0 20px; }
+        .meal-item { background: var(--surface); border-radius: 16px; padding: 16px; margin-bottom: 12px; border: 1px solid transparent; transition: border-color 0.2s; position: relative; }
+        .meal-item:active { border-color: var(--primary); }
+        .meal-cat { font-size: 10px; font-weight: 800; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+        .meal-name { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 4px; line-height: 1.4; padding-right: 30px; }
+        .meal-macros { font-size: 12px; color: var(--text-muted); font-family: monospace; }
+        .meal-ings { font-size: 13px; color: #d4d4d8; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); line-height: 1.5; }
+        
+        .btn-icon { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; position: absolute; top: 12px; right: 12px; transition: transform 0.1s; }
+        .btn-add { background: var(--primary); color: #000; }
+        .btn-del { background: rgba(255, 59, 48, 0.1); color: #ff3b30; }
+        .btn-icon:active { transform: scale(0.9); }
+
+        /* --- LIBRARY SEARCH --- */
+        .search-container { position: sticky; top: 69px; background: var(--bg); z-index: 40; padding: 10px 20px 20px; }
+        .search-input { width: 100%; background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 12px 16px; border-radius: 12px; font-size: 15px; outline: none; transition: border-color 0.2s; }
+        .search-input:focus { border-color: var(--primary); }
+        .cat-filters { display: flex; gap: 8px; overflow-x: auto; margin-top: 12px; scrollbar-width: none; }
+        .filter-chip { background: var(--surface-light); padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; color: var(--text-muted); border: 1px solid transparent; cursor: pointer; white-space: nowrap; }
+        .filter-chip.active { background: var(--primary); color: #000; }
+
+        /* --- MODAL --- */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; padding: 20px; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+        .modal-content { background: var(--surface); width: 100%; max-width: 500px; border-radius: 24px; border: 1px solid var(--border); overflow: hidden; display: flex; flex-direction: column; max-height: 90vh; }
+        .modal-header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .modal-body { padding: 20px; overflow-y: auto; }
+        .modal-footer { padding: 20px; border-top: 1px solid var(--border); background: var(--surface-light); }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 6px; }
+        .form-control { width: 100%; background: #000; border: 1px solid var(--border); color: var(--text); padding: 10px; border-radius: 8px; font-size: 14px; }
+        
+        .cycle-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 8px; align-items: center; margin-bottom: 8px; }
+        .cycle-label { font-size: 13px; font-weight: 600; }
+        .cycle-input { width: 100%; background: #000; border: 1px solid var(--border); color: var(--primary); padding: 8px; border-radius: 6px; font-size: 13px; text-align: center; }
+
+        .btn-primary { width: 100%; background: var(--text); color: #000; padding: 14px; border-radius: 12px; border: none; font-weight: 700; font-size: 15px; cursor: pointer; }
+        .btn-outline { width: 100%; background: transparent; border: 1px solid var(--border); color: var(--text); padding: 14px; border-radius: 12px; font-weight: 600; cursor: pointer; }
+
+        /* VIEWS */
+        .view { display: none; }
+        .view.active { display: block; animation: fadeUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* PRINT */
+        @media print {
+            body { background: white; color: black; overflow: visible; padding: 0; }
+            .header, .nav-bottom, .day-scroll, .btn-icon, .search-container, .btn-primary, .btn-outline { display: none !important; }
+            .view { display: block !important; }
+            .meal-item { border: 1px solid #ddd; background: white; color: black; page-break-inside: avoid; box-shadow: none; margin-bottom: 10px; }
+            .meal-name { color: black; }
+            .meal-ings { color: #555; border-top: 1px solid #eee; }
+            h1 { color: black; -webkit-text-fill-color: black; }
+            #planner-list:before { content: "Plan Nutricional Semanal"; font-size: 24px; font-weight: bold; display: block; margin-bottom: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="view-planner" class="view active">
+        <header>
+            <h1>MaldoFit</h1>
+            <button onclick="openModal()" style="background:rgba(34,211,238,0.1); color:var(--primary); border:none; padding:6px 12px; border-radius:20px; font-size:12px; font-weight:700;">OBJETIVOS</button>
+        </header>
+
+        <div class="day-scroll">
+            <div class="day-pill active" onclick="setDay('Lunes', this)">Lunes</div>
+            <div class="day-pill" onclick="setDay('Martes', this)">Martes</div>
+            <div class="day-pill" onclick="setDay('Miércoles', this)">Miércoles</div>
+            <div class="day-pill" onclick="setDay('Jueves', this)">Jueves</div>
+            <div class="day-pill" onclick="setDay('Viernes', this)">Viernes</div>
+            <div class="day-pill" onclick="setDay('Sábado', this)">Sábado</div>
+            <div class="day-pill" onclick="setDay('Domingo', this)">Domingo</div>
+        </div>
+
+        <div class="dashboard">
+            <div class="stat-card">
+                <span class="stat-val" id="val-k">0</span><span class="stat-label">Kcal</span>
+                <div class="progress-bar"><div id="bar-k" class="progress-fill" style="background:#fff"></div></div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-val" id="val-p">0</span><span class="stat-label">Prot</span>
+                <div class="progress-bar"><div id="bar-p" class="progress-fill" style="background:var(--accent)"></div></div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-val" id="val-c">0</span><span class="stat-label">Carb</span>
+                <div class="progress-bar"><div id="bar-c" class="progress-fill" style="background:var(--success)"></div></div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-val" id="val-f">0</span><span class="stat-label">Grasa</span>
+                <div class="progress-bar"><div id="bar-f" class="progress-fill" style="background:var(--primary)"></div></div>
+            </div>
+        </div>
+
+        <div id="planner-list" class="meal-list"></div>
+        <div style="text-align:center; padding: 20px; opacity: 0.5; font-size: 12px;">Desliza hacia abajo para ver más</div>
+    </div>
+
+    <div id="view-library" class="view">
+        <header>
+            <h1>Alimentos</h1>
+        </header>
+        <div class="search-container">
+            <input type="text" id="search" class="search-input" placeholder="Buscar plato (ej: avena, pavo)..." onkeyup="renderLib()">
+            <div class="cat-filters">
+                <div class="filter-chip active" onclick="setCat('Desayuno', this)">Desayuno</div>
+                <div class="filter-chip" onclick="setCat('Tentempié', this)">Media Mañana</div>
+                <div class="filter-chip" onclick="setCat('Comida', this)">Comida</div>
+                <div class="filter-chip" onclick="setCat('Merienda', this)">Merienda</div>
+                <div class="filter-chip" onclick="setCat('Cena', this)">Cena</div>
+            </div>
+        </div>
+        <div id="lib-list" class="meal-list"></div>
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="margin:0; font-size:18px;">Configuración</h2>
+                <button onclick="closeModal()" style="background:none; border:none; color:var(--text-muted); font-size:20px;">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="background:var(--surface-light); padding:15px; border-radius:12px; margin-bottom:20px;">
+                    <h3 style="margin:0 0 15px 0; font-size:14px; color:var(--primary);">Calculadora Harris-Benedict</h3>
+                    <div class="form-grid">
+                        <div class="form-group"><label>Peso (kg)</label><input type="number" id="w" class="form-control" value="80"></div>
+                        <div class="form-group"><label>Altura (cm)</label><input type="number" id="h" class="form-control" value="180"></div>
+                        <div class="form-group"><label>Edad</label><input type="number" id="a" class="form-control" value="30"></div>
+                        <div class="form-group"><label>Sexo</label><select id="s" class="form-control"><option value="m">Hombre</option><option value="f">Mujer</option></select></div>
+                    </div>
+                    <div class="form-group"><label>Objetivo</label>
+                        <select id="goal" class="form-control">
+                            <option value="-0.2">Definición Agresiva (-20%)</option>
+                            <option value="-0.1">Definición Moderada (-10%)</option>
+                            <option value="0" selected>Mantenimiento</option>
+                            <option value="0.1">Volumen Limpio (+10%)</option>
+                            <option value="0.2">Volumen Agresivo (+20%)</option>
+                        </select>
+                    </div>
+                    <button class="btn-outline" onclick="calcBase()" style="margin-top:10px; font-size:12px; padding:10px;">Autocalcular todos los días</button>
+                </div>
+
+                <h3 style="margin:0 0 10px 0; font-size:14px;">Ajuste Diario Manual</h3>
+                <div id="cycle-grid">
+                    </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-primary" onclick="saveTargets()">Guardar Cambios</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="nav-bottom">
+        <button class="nav-btn active" onclick="goView('view-planner', this)">
+            <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2zm-7 5h5v5h-5v-5z"/></svg>
+            Plan
+        </button>
+        <button class="nav-btn" onclick="goView('view-library', this)">
+            <svg viewBox="0 0 24 24"><path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.66 3.84 3.75 3.97V22h2.5v-9.03C11.34 12.84 13 11.12 13 9V2h-2v7zm5-3v8h2.5v8H21V2c-2.76 0-5 2.24-5 4z"/></svg>
+            Alimentos
+        </button>
+        <button class="nav-btn" onclick="window.print()">
+            <svg viewBox="0 0 24 24"><path d="M19 8h-1V3H6v5H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zM8 5h8v3H8V5zm8 12v2H8v-2h8zm2-2v-2H6v2H4v-4c0-.55.45-1 1-1h14c.55 0 1 .45 1 1v4h-2z"/><circle cx="18" cy="11.5" r="1"/></svg>
+            PDF
+        </button>
+    </div>
+
+    <script src="data.js"></script> <script>
+        // --- ESTADO APP ---
+        let activeDay = "Lunes";
+        let activeCat = "Desayuno";
+        let targets = {};
+        let weeklyPlan = { "Lunes":[], "Martes":[], "Miércoles":[], "Jueves":[], "Viernes":[], "Sábado":[], "Domingo":[] };
+        const days = ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"];
+
+        // --- INICIALIZACIÓN ---
+        window.onload = function() {
+            // Cargar Targets
+            const t = localStorage.getItem('mf_targets');
+            if(t) targets = JSON.parse(t);
+            else calcBase(); // Si es primera vez, calcula default
+
+            // Cargar Plan
+            const p = localStorage.getItem('mf_plan');
+            if(p) weeklyPlan = JSON.parse(p);
+
+            renderCycleGrid();
+            renderLib();
+            renderPlan();
+        };
+
+        // --- LÓGICA CALCULADORA ---
+        function calcBase() {
+            const w = parseFloat(document.getElementById('w').value);
+            const h = parseFloat(document.getElementById('h').value);
+            const a = parseFloat(document.getElementById('a').value);
+            const s = document.getElementById('s').value;
+            const goal = parseFloat(document.getElementById('goal').value);
+            
+            // Harris-Benedict
+            let bmr = (s==='m') ? 88.362 + (13.397*w) + (4.799*h) - (5.677*a) : 447.593 + (9.247*w) + (3.098*h) - (4.330*a);
+            const tdee = bmr * 1.55; // Actividad media por defecto
+            const k = Math.round(tdee * (1 + goal));
+            
+            // Macros Base
+            const p = Math.round(w * 2);
+            const f = Math.round(w * 0.9);
+            const c = Math.round((k - (p*4 + f*9)) / 4);
+
+            days.forEach(d => {
+                targets[d] = { k, p, c, f };
+            });
+            
+            renderCycleGrid(); // Mostrar en tabla para edición manual
+        }
+
+        function renderCycleGrid() {
+            const grid = document.getElementById('cycle-grid');
+            grid.innerHTML = '';
+            
+            // Header
+            grid.innerHTML += `<div class="cycle-row" style="border-bottom:1px solid #333; padding-bottom:5px; margin-bottom:10px;">
+                <span style="font-size:10px; color:#888;">DÍA</span>
+                <span style="font-size:10px; color:#fff; text-align:center;">KCAL</span>
+                <span style="font-size:10px; color:var(--accent); text-align:center;">PROT</span>
+                <span style="font-size:10px; color:var(--success); text-align:center;">CARB</span>
+                <span style="font-size:10px; color:var(--primary); text-align:center;">GRAS</span>
+            </div>`;
+
+            days.forEach(d => {
+                const t = targets[d] || {k:2500, p:160, c:300, f:70};
+                grid.innerHTML += `
+                    <div class="cycle-row">
+                        <span class="cycle-label">${d}</span>
+                        <input type="number" id="k-${d}" class="cycle-input" value="${t.k}" style="color:white">
+                        <input type="number" id="p-${d}" class="cycle-input" value="${t.p}" style="color:var(--accent)">
+                        <input type="number" id="c-${d}" class="cycle-input" value="${t.c}" style="color:var(--success)">
+                        <input type="number" id="f-${d}" class="cycle-input" value="${t.f}" style="color:var(--primary)">
+                    </div>
+                `;
+            });
+        }
+
+        function saveTargets() {
+            days.forEach(d => {
+                targets[d] = {
+                    k: parseInt(document.getElementById(`k-${d}`).value),
+                    p: parseInt(document.getElementById(`p-${d}`).value),
+                    c: parseInt(document.getElementById(`c-${d}`).value),
+                    f: parseInt(document.getElementById(`f-${d}`).value)
+                };
+            });
+            localStorage.setItem('mf_targets', JSON.stringify(targets));
+            closeModal();
+            renderPlan(); // Actualizar barras home
+        }
+
+        // --- NAVEGACIÓN ---
+        function goView(viewId, btn) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        function setDay(d, pill) {
+            activeDay = d;
+            document.querySelectorAll('.day-pill').forEach(p => p.classList.remove('active'));
+            pill.classList.add('active');
+            renderPlan();
+        }
+
+        function setCat(c, chip) {
+            activeCat = c;
+            document.querySelectorAll('.filter-chip').forEach(f => f.classList.remove('active'));
+            chip.classList.add('active');
+            renderLib();
+        }
+
+        // --- RENDERIZADO ---
+        function renderLib() {
+            const list = document.getElementById('lib-list');
+            const term = document.getElementById('search').value.toLowerCase();
+            list.innerHTML = '';
+
+            // Si foodDB no existe (por si el usuario no cargó el js), evitar crash
+            if (typeof foodDB === 'undefined') {
+                list.innerHTML = '<p style="text-align:center; color:red;">Error: data.js no cargado.</p>';
+                return;
+            }
+
+            const filtered = foodDB.filter(x => {
+                let matchCat = x.type === activeCat;
+                // Mapeo flexible
+                if(activeCat === 'Tentempié' && (x.type.includes('Mañana') || x.type.includes('M.MAÑANA'))) matchCat = true;
+                return matchCat && (x.name.toLowerCase().includes(term) || x.ings.toLowerCase().includes(term));
+            });
+
+            filtered.forEach(x => {
+                const div = document.createElement('div');
+                div.className = 'meal-item';
+                div.innerHTML = `
+                    <div class="meal-cat">${x.type}</div>
+                    <div class="meal-name">${x.name}</div>
+                    <div class="meal-macros">🔥${x.kcal} · P${x.p} · C${x.c} · F${x.f}</div>
+                    <div class="meal-ings">${x.ings}</div>
+                    <button class="btn-action btn-add" onclick="addFood(${x.id})">+</button>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function renderPlan() {
+            const list = document.getElementById('planner-list');
+            list.innerHTML = '';
+            let t = {k:0, p:0, c:0, f:0};
+
+            weeklyPlan[activeDay].forEach((x, idx) => {
+                t.k += x.kcal; t.p += x.p; t.c += x.c; t.f += x.f;
+                const div = document.createElement('div');
+                div.className = 'meal-item';
+                div.innerHTML = `
+                    <div class="meal-cat">${x.type}</div>
+                    <div class="meal-name">${x.name}</div>
+                    <div class="meal-macros">🔥${x.kcal} · P${x.p} · C${x.c} · F${x.f}</div>
+                    <div class="meal-ings">${x.ings}</div>
+                    <button class="btn-action btn-del" onclick="delFood(${idx})">&times;</button>
+                `;
+                list.appendChild(div);
+            });
+
+            // Update Stats Bar
+            const tgt = targets[activeDay] || {k:2500, p:160, c:300, f:70};
+            updateBar('k', t.k, tgt.k);
+            updateBar('p', t.p, tgt.p);
+            updateBar('c', t.c, tgt.c);
+            updateBar('f', t.f, tgt.f);
+        }
+
+        function updateBar(key, val, max) {
+            document.getElementById(`val-${key}`).innerText = `${val} / ${max}`;
+            const pct = Math.min((val/max)*100, 100);
+            document.getElementById(`bar-${key}`).style.width = `${pct}%`;
+        }
+
+        // --- ACCIONES ---
+        function addFood(id) {
+            const item = foodDB.find(x => x.id === id);
+            weeklyPlan[activeDay].push(item);
+            savePlan();
+            renderPlan();
+        }
+
+        function delFood(idx) {
+            weeklyPlan[activeDay].splice(idx, 1);
+            savePlan();
+            renderPlan();
+        }
+
+        function savePlan() {
+            localStorage.setItem('mf_plan', JSON.stringify(weeklyPlan));
+        }
+
+        function openModal() { document.getElementById('modal').style.display='flex'; }
+        function closeModal() { document.getElementById('modal').style.display='none'; }
+
     </script>
 </body>
 </html>
